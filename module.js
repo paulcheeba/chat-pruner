@@ -104,4 +104,121 @@ class ChatPrunerApp extends Application {
 
   _summarize(msg) {
     const html = msg?.flavor || msg?.content || "";
-    cons
+    const text = stripHTMLSafe(html);
+    return text.length > 160 ? text.slice(0, 157) + "…" : (text || "(empty)");
+  }
+
+  activateListeners(html) {
+    super.activateListeners(html);
+
+    // Row click toggles the checkbox unless clicking on controls
+    html.find(".pruner-row").on("click", (ev) => {
+      if (["INPUT", "BUTTON", "LABEL", "A"].includes(ev.target.tagName)) return;
+      const $row = $(ev.currentTarget);
+      const $cb = $row.find("input.sel[type=checkbox]");
+      if ($cb.is(":enabled")) $cb.prop("checked", !$cb.prop("checked"));
+    });
+
+    // Select all
+    html.find("#pruner-select-all").on("change", (ev) => {
+      const checked = ev.currentTarget.checked;
+      html.find("input.sel[type=checkbox]:enabled").prop("checked", checked);
+    });
+
+    // Buttons
+    html.find("[data-action=deleteSelected]").on("click", () => this._deleteSelected(html));
+    html.find("[data-action=deleteNewer]").on("click", () => this._deleteNewerThanAnchor(html));
+    html.find("[data-action=deleteOlder]").on("click", () => this._deleteOlderThanAnchor(html));
+    html.find("[data-action=refresh]").on("click", () => this.render(true));
+    html.find("[data-action=about]").on("click", () => this._about());
+  }
+
+  async _deleteSelected(html) {
+    const ids = html.find("input.sel[type=checkbox]:checked").map((_, el) => el.value).get();
+    if (!ids.length) return ui.notifications?.warn?.("No messages selected.");
+
+    const ok = await Dialog.confirm({
+      title: "Delete Selected Messages",
+      content: `<p>Delete ${ids.length} selected message(s)? This cannot be undone.</p>`,
+    });
+    if (!ok) return;
+
+    await this._deleteByIds(ids);
+  }
+
+  async _deleteNewerThanAnchor(html) {
+    const anchorId = html.find("input.anchor[type=radio]:checked").val();
+    if (!anchorId) return ui.notifications?.warn?.("Choose an anchor message first.");
+
+    const rows = this._getLastMessages(200); // oldest → newest
+    const idx = rows.findIndex((r) => r.id === anchorId);
+    if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
+
+    // NEWER than anchor = after it in the oldest→newest array
+    const newer = rows.slice(idx + 1);
+    const ids = newer.filter((r) => r.canDelete).map((r) => r.id);
+    const blocked = newer.filter((r) => !r.canDelete).length;
+
+    if (!ids.length) return ui.notifications?.info?.("No deletable messages newer than the selected anchor.");
+
+    const ok = await Dialog.confirm({
+      title: "Delete Newer Than Anchor",
+      content: `<p>Delete ${ids.length} newer message(s) than the selected anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`,
+    });
+    if (!ok) return;
+
+    await this._deleteByIds(ids);
+  }
+
+  async _deleteOlderThanAnchor(html) {
+    const anchorId = html.find("input.anchor[type=radio]:checked").val();
+    if (!anchorId) return ui.notifications?.warn?.("Choose an anchor message first.");
+
+    const rows = this._getLastMessages(200); // oldest → newest
+    const idx = rows.findIndex((r) => r.id === anchorId);
+    if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
+
+    // OLDER than anchor = before it in the oldest→newest array
+    const older = rows.slice(0, idx);
+    const ids = older.filter((r) => r.canDelete).map((r) => r.id);
+    const blocked = older.filter((r) => !r.canDelete).length;
+
+    if (!ids.length) return ui.notifications?.info?.("No deletable messages older than the selected anchor.");
+
+    const ok = await Dialog.confirm({
+      title: "Delete Older Than Anchor",
+      content: `<p>Delete ${ids.length} older message(s) than the selected anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`,
+    });
+    if (!ok) return;
+
+    await this._deleteByIds(ids);
+  }
+
+  async _deleteByIds(ids) {
+    // GM-only UI, but still respect per-message permission
+    const deletable = ids.filter((id) => {
+      const m = game.messages.get(id);
+      return m && canDeleteMessage(m, game.user);
+    });
+
+    if (!deletable.length) return ui.notifications?.error?.("You don't have permission to delete the selected messages.");
+
+    try {
+      await deleteMessagesByIds(deletable);
+      ui.notifications?.info?.(`Deleted ${deletable.length} message(s).`);
+      this.render(true);
+    } catch (err) {
+      console.error(`${MOD} | delete failed`, err);
+      ui.notifications?.error?.("Some messages could not be deleted. See console for details.");
+    }
+  }
+
+  _about() {
+    new Dialog({
+      title: "About Chat Pruner",
+      content: `<p><strong>Chat Pruner</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
+                <p>Compatible with Foundry VTT v11–v13. UI uses Application (v1) only.</p>`,
+      buttons: { ok: { label: "OK" } },
+    }).render(true);
+  }
+}
