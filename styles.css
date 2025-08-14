@@ -1,122 +1,37 @@
-/* ================================
-   Chat Pruner — Dark Nord/Dracula
-   ================================= */
-.fvtt-chat-pruner {
-  /* Nord-ish palette */
-  --cp-bg: #2e3440;          /* window bg */
-  --cp-surface: #3b4252;     /* surfaces / rows */
-  --cp-surface-2: #434c5e;   /* hover / alt */
-  --cp-border: #4c566a;      /* borders */
-  --cp-text: #eceff4;        /* primary text */
-  --cp-subtext: #d8dee9;     /* secondary */
-  --cp-muted: #8f98a7;       /* muted */
-  --cp-accent: #88c0d0;      /* accent / focus */
-  --cp-danger: #bf616a;      /* delete */
-  --cp-danger-2: #a54e56;
-  --cp-ok: #a3be8c;
-}
-
-.fvtt-chat-pruner .window-content {
-  padding: 0;
-  background: var(--cp-bg);
-  color: var(--cp-text);
-}
-
-/* Header / Footer */
-.pruner-head, .pruner-foot {
-  padding: 10px 12px;
-  background: var(--cp-surface);
-  border-bottom: 1px solid var(--cp-border);
-}
-.pruner-foot {
-  border-top: 1px solid var(--cp-border);
-  border-bottom: none;
-}
-
-.pruner-head {
-  display: flex; justify-content: space-between; align-items: center;
-  font-size: 12px; color: var(--cp-subtext);
-}
-.pruner-head .checkbox input { margin-right: 6px; }
-
-/* Column labels */
+/* --- Layout tuning: give more space to Preview --- */
 .pruner-cols {
-  position: sticky; top: 0; z-index: 1;
-  display: grid;
-  grid-template-columns: 40px 52px 240px 180px 1fr;
-  gap: 8px;
-  align-items: center;
-  padding: 8px 12px;
-  background: var(--cp-bg);
-  border-bottom: 1px solid var(--cp-border);
-  font-size: 12px; color: var(--cp-subtext); letter-spacing: .2px;
+  /* old: 40px 52px 240px 180px 1fr */
+  grid-template-columns: 40px 40px 180px 140px 1fr;
 }
-
-/* List */
-.pruner-list {
-  list-style: none; padding: 0; margin: 0;
-  overflow: auto; height: 100%;
-  background: var(--cp-bg);
-}
-
-.pruner-row {
-  padding: 8px 12px;
-  border-bottom: 1px solid var(--cp-border);
-  background: var(--cp-bg);
-  transition: background .12s ease, border-color .12s ease;
-}
-.pruner-row:hover { background: var(--cp-surface); }
-
-.pruner-row.locked { opacity: 0.7; }
 
 .pruner-row .cells {
-  display: grid;
-  grid-template-columns: 40px 52px 240px 180px 1fr;
-  gap: 8px;
-  align-items: center;
+  /* match headers */
+  grid-template-columns: 40px 40px 180px 140px 1fr;
 }
 
-/* Cells */
-.cell.time { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace; font-size: 12px; color: var(--cp-subtext); }
-.cell.content { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--cp-text); }
-.cell .user { color: var(--cp-muted); margin-left: 6px; }
-.cell .note { color: var(--cp-muted); font-style: italic; margin-left: 6px; }
-.speaker-name { color: var(--cp-text); }
-
-/* Selected row highlight */
-.pruner-row.is-selected { background: var(--cp-surface-2); }
-.pruner-row.is-selected .speaker-name { color: var(--cp-accent); }
-
-/* Buttons */
-.pruner-foot .btns {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-}
-.pruner-foot .spacer { flex: 1 1 auto; }
-
-.pruner-foot .btn {
-  appearance: none; border: 1px solid var(--cp-border);
-  background: var(--cp-surface); color: var(--cp-text);
-  padding: 6px 10px; border-radius: 8px; font-size: 12px;
-  transition: background .12s ease, border-color .12s ease, color .12s ease;
-}
-.pruner-foot .btn:hover { background: var(--cp-surface-2); border-color: var(--cp-accent); }
-.pruner-foot .btn:focus { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--cp-accent) 35%, transparent); }
-.pruner-foot .btn.ghost { opacity: .9; }
-.pruner-foot .btn.primary {
-  border-color: color-mix(in srgb, var(--cp-danger) 60%, var(--cp-border));
-  background: color-mix(in srgb, var(--cp-danger) 25%, var(--cp-surface));
-}
-.pruner-foot .btn.primary:hover {
-  background: color-mix(in srgb, var(--cp-danger) 35%, var(--cp-surface-2));
-  border-color: var(--cp-danger);
+/* --- Preview: allow 2 lines with graceful ellipsis --- */
+.cell.content {
+  white-space: normal;                  /* allow wrapping */
+  overflow: hidden;
+  display: -webkit-box;                 /* line-clamp mechanism */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;                /* show up to 2 lines */
+  line-height: 1.25;
+  max-height: calc(1.25em * 2 + 2px);   /* clamps height to two lines */
 }
 
-/* Tip */
-.pruner-foot .tip { margin: 6px 0 0; font-size: 12px; color: var(--cp-muted); }
+/* Slightly tighten speaker column so names don't push preview */
+.cell.speaker .speaker-name { margin-right: 4px; }
 
-/* Inputs look nicer on dark */
-.fvtt-chat-pruner input[type="checkbox"],
-.fvtt-chat-pruner input[type="radio"] {
-  accent-color: var(--cp-accent);
-  transform: translateY(1px);
+/* --- Footer: stick to bottom to remove the “gap” feel --- */
+.pruner-wrap { display: flex; flex-direction: column; height: 100%; }
+.pruner-list { flex: 1 1 auto; }        /* list takes remaining height */
+.pruner-foot {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background-clip: padding-box;
 }
+
+/* Optional: softer separator so rows feel connected to footer */
+.pruner-row { border-bottom: 1px solid var(--cp-border); }
