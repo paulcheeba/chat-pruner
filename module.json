@@ -1,7 +1,7 @@
 {
   "id": "fvtt-chat-pruner",
   "name": "fvtt-chat-pruner",
-  "title": "Chat Pruner (GM-only)",
+  "title": "Chat Pruner",
   "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (Application v1).",
   "version": "1.2.4",
   "compatibility": {
