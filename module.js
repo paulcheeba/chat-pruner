@@ -22,12 +22,10 @@ function canDeleteMessage(msg, user) {
 
 /** Cross-version bulk delete */
 async function deleteMessagesByIds(ids) {
-  // Prefer collection bulk delete if available
   const coll = game.messages;
   if (coll && typeof coll.deleteDocuments === "function") {
     return coll.deleteDocuments(ids);
   }
-  // FVTT sometimes exposes static bulk delete on the document class
   if (typeof ChatMessage?.deleteDocuments === "function") {
     return ChatMessage.deleteDocuments(ids);
   }
@@ -69,10 +67,10 @@ class ChatPrunerApp extends Application {
       id: `${MOD}-window`,
       title: "Chat Pruner",
       template: `modules/${MOD}/templates/chat-pruner.hbs`,
-      width: 820,
-      height: 660,
+      width: 840,
+      height: 680,
       resizable: true,
-      classes: [MOD],
+      classes: [MOD], // => .fvtt-chat-pruner
     });
   }
 
@@ -83,7 +81,7 @@ class ChatPrunerApp extends Application {
 
   _getLastMessages(limit) {
     const all = game.messages?.contents ?? [];
-    // Ensure oldest → newest (needed for anchor logic)
+    // oldest → newest for anchor logic
     const slice = all.slice(-limit).sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
     return slice.map((m) => {
       const ts = m?.timestamp ?? m?._source?.timestamp ?? 0;
@@ -108,7 +106,7 @@ class ChatPrunerApp extends Application {
     return text.length > 160 ? text.slice(0, 157) + "…" : (text || "(empty)");
   }
 
-    activateListeners(html) {
+  activateListeners(html) {
     super.activateListeners(html);
 
     // Row click toggles the checkbox unless clicking on controls
@@ -139,8 +137,46 @@ class ChatPrunerApp extends Application {
     html.find("[data-action=deleteOlder]").on("click", () => this._deleteOlderThanAnchor(html));
     html.find("[data-action=refresh]").on("click", () => this.render(true));
     html.find("[data-action=about]").on("click", () => this._about());
-  }
 
+    // Tooltip: follow mouse showing full content (from data-full attr)
+    const $tooltip = html.find("#cp-tooltip");
+    // Ensure tooltip exists even if the template was customized
+    if (!$tooltip.length) {
+      html.append('<div id="cp-tooltip"></div>');
+    }
+    const tooltip = html.find("#cp-tooltip");
+    const OFFSET = 16;
+
+    function positionTooltip(ev) {
+      // Basic edge-avoidance: nudge left/up if near right/bottom
+      const tip = tooltip.get(0);
+      if (!tip) return;
+      const vw = window.innerWidth, vh = window.innerHeight;
+      const rect = tip.getBoundingClientRect();
+      let left = ev.clientX + OFFSET;
+      let top = ev.clientY + OFFSET;
+      if (left + rect.width + 8 > vw) left = ev.clientX - rect.width - OFFSET;
+      if (top + rect.height + 8 > vh) top = ev.clientY - rect.height - OFFSET;
+      tooltip.css({ left, top });
+    }
+
+    html.find(".cell.content").each(function () {
+      const $el = $(this);
+      const fullText = $el.attr("data-full") || $el.attr("title") || $el.text();
+      if (!fullText) return;
+
+      $el
+        .on("mouseenter", function () {
+          tooltip.text(fullText).addClass("show");
+        })
+        .on("mousemove", function (ev) {
+          positionTooltip(ev);
+        })
+        .on("mouseleave", function () {
+          tooltip.removeClass("show");
+        });
+    });
+  }
 
   async _deleteSelected(html) {
     const ids = html.find("input.sel[type=checkbox]:checked").map((_, el) => el.value).get();
@@ -163,7 +199,6 @@ class ChatPrunerApp extends Application {
     const idx = rows.findIndex((r) => r.id === anchorId);
     if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
 
-    // NEWER than anchor = after it in the oldest→newest array
     const newer = rows.slice(idx + 1);
     const ids = newer.filter((r) => r.canDelete).map((r) => r.id);
     const blocked = newer.filter((r) => !r.canDelete).length;
@@ -187,7 +222,6 @@ class ChatPrunerApp extends Application {
     const idx = rows.findIndex((r) => r.id === anchorId);
     if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
 
-    // OLDER than anchor = before it in the oldest→newest array
     const older = rows.slice(0, idx);
     const ids = older.filter((r) => r.canDelete).map((r) => r.id);
     const blocked = older.filter((r) => !r.canDelete).length;
@@ -204,7 +238,6 @@ class ChatPrunerApp extends Application {
   }
 
   async _deleteByIds(ids) {
-    // GM-only UI, but still respect per-message permission
     const deletable = ids.filter((id) => {
       const m = game.messages.get(id);
       return m && canDeleteMessage(m, game.user);
