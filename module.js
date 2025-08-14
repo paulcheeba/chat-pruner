@@ -1,25 +1,50 @@
 // fvtt-chat-pruner — GM-only chat pruning tool (v11–v13) — Application (v1) only
 const MOD = "fvtt-chat-pruner";
 
+/** Safely strip HTML to plain text across FVTT versions/browsers */
+function stripHTMLSafe(input) {
+  const html = String(input ?? "");
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  const text = (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+  return text;
+}
+
+/** Defensive can-delete check across versions */
+function canDeleteMessage(msg, user) {
+  try {
+    if (user?.isGM) return true;
+    if (typeof msg?.canUserModify === "function") return msg.canUserModify(user, "delete");
+    // Fallback for older APIs: allow owners to delete their own
+    if ("isOwner" in msg) return !!msg.isOwner;
+  } catch (e) {
+    // fall through to false
+  }
+  return false;
+}
+
 Hooks.once("init", async () => {
   await loadTemplates([`modules/${MOD}/templates/chat-pruner.hbs`]);
 });
 
 Hooks.once("ready", () => {
   // Expose a tiny API for the macro
-  game.modules.get(MOD).api = {
-    open: () => ChatPrunerApp.open(),
-  };
+  const mod = game.modules.get(MOD);
+  if (mod) {
+    mod.api = {
+      open: () => ChatPrunerApp.open(),
+    };
+  }
   console.log(`${MOD} | Ready. Create a Macro with: game.modules.get('${MOD}')?.api?.open()`);
 });
 
 class ChatPrunerApp extends Application {
   static open() {
     if (!game.user?.isGM) {
-      ui.notifications.warn("Chat Pruner is GM-only.");
+      ui.notifications?.warn?.("Chat Pruner is GM-only.");
       return;
     }
-    const existing = Object.values(ui.windows).find(w => w instanceof ChatPrunerApp);
+    const existing = Object.values(ui.windows).find((w) => w instanceof ChatPrunerApp);
     if (existing) return existing.bringToTop();
     new ChatPrunerApp().render(true);
   }
@@ -43,29 +68,28 @@ class ChatPrunerApp extends Application {
 
   _getLastMessages(limit) {
     const all = game.messages?.contents ?? [];
-    // oldest → newest (needed for "after anchor")
-    const slice = all.slice(-limit).sort((a, b) => (a.timestamp ?? 0) - (b.timestamp ?? 0));
-    return slice.map(m => {
-      const ts = m.timestamp ?? m._source?.timestamp ?? 0;
+    // Ensure oldest → newest (needed for "after anchor")
+    const slice = all.slice(-limit).sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
+    return slice.map((m) => {
+      const ts = m?.timestamp ?? m?._source?.timestamp ?? 0;
       const when = ts ? new Date(ts).toLocaleString() : "";
-      const canDelete = game.user.isGM || m.canUserModify?.(game.user, "delete");
-      const speaker = m.speaker?.alias || m.speaker?.actor || "—";
-      const user = m.user?.name ?? "Unknown";
+      const speaker = m?.speaker?.alias || m?.speaker?.actor || "—";
+      const user = m?.user?.name ?? "Unknown";
       return {
-        id: m.id,
+        id: m?.id,
         when,
         ts,
         user,
         speaker,
         content: this._summarize(m),
-        canDelete,
+        canDelete: canDeleteMessage(m, game.user),
       };
     });
   }
 
   _summarize(msg) {
-    const html = msg.flavor || msg.content || "";
-    const text = foundry.utils.stripHTML(html ?? "").replace(/\s+/g, " ").trim();
+    const html = msg?.flavor || msg?.content || "";
+    const text = stripHTMLSafe(html);
     return text.length > 160 ? text.slice(0, 157) + "…" : (text || "(empty)");
   }
 
@@ -95,11 +119,11 @@ class ChatPrunerApp extends Application {
 
   async _deleteSelected(html) {
     const ids = html.find("input.sel[type=checkbox]:checked").map((_, el) => el.value).get();
-    if (!ids.length) return ui.notifications.warn("No messages selected.");
+    if (!ids.length) return ui.notifications?.warn?.("No messages selected.");
 
     const ok = await Dialog.confirm({
       title: "Delete Selected Messages",
-      content: `<p>Delete ${ids.length} selected message(s)? This cannot be undone.</p>`
+      content: `<p>Delete ${ids.length} selected message(s)? This cannot be undone.</p>`,
     });
     if (!ok) return;
 
@@ -108,21 +132,21 @@ class ChatPrunerApp extends Application {
 
   async _deleteAfterAnchor(html) {
     const anchorId = html.find("input.anchor[type=radio]:checked").val();
-    if (!anchorId) return ui.notifications.warn("Choose an anchor message first.");
+    if (!anchorId) return ui.notifications?.warn?.("Choose an anchor message first.");
 
     const rows = this._getLastMessages(200); // oldest → newest
-    const idx = rows.findIndex(r => r.id === anchorId);
-    if (idx === -1) return ui.notifications.error("Anchor message not found.");
+    const idx = rows.findIndex((r) => r.id === anchorId);
+    if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
 
     const after = rows.slice(idx + 1);
-    const ids = after.filter(r => r.canDelete).map(r => r.id);
-    const blocked = after.filter(r => !r.canDelete).length;
+    const ids = after.filter((r) => r.canDelete).map((r) => r.id);
+    const blocked = after.filter((r) => !r.canDelete).length;
 
-    if (!ids.length) return ui.notifications.info("No deletable messages after the selected anchor.");
+    if (!ids.length) return ui.notifications?.info?.("No deletable messages after the selected anchor.");
 
     const ok = await Dialog.confirm({
       title: "Delete Messages After Anchor",
-      content: `<p>Delete ${ids.length} message(s) after the anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`
+      content: `<p>Delete ${ids.length} message(s) after the anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`,
     });
     if (!ok) return;
 
@@ -130,20 +154,21 @@ class ChatPrunerApp extends Application {
   }
 
   async _deleteByIds(ids) {
-    // Extra safety: GM-only UI, but keep per-message permission check
-    const deletable = ids.filter(id => {
+    // GM-only UI, but still respect per-message permission
+    const deletable = ids.filter((id) => {
       const m = game.messages.get(id);
-      return m && (game.user.isGM || m.canUserModify?.(game.user, "delete"));
+      return m && canDeleteMessage(m, game.user);
     });
-    if (!deletable.length) return ui.notifications.error("You don't have permission to delete the selected messages.");
+
+    if (!deletable.length) return ui.notifications?.error?.("You don't have permission to delete the selected messages.");
 
     try {
       await game.messages.deleteDocuments(deletable);
-      ui.notifications.info(`Deleted ${deletable.length} message(s).`);
+      ui.notifications?.info?.(`Deleted ${deletable.length} message(s).`);
       this.render(true);
     } catch (err) {
       console.error(`${MOD} | delete failed`, err);
-      ui.notifications.error("Some messages could not be deleted. See console for details.");
+      ui.notifications?.error?.("Some messages could not be deleted. See console for details.");
     }
   }
 
@@ -152,7 +177,7 @@ class ChatPrunerApp extends Application {
       title: "About Chat Pruner",
       content: `<p><strong>Chat Pruner</strong> (GM-only). View last 200 chat messages, select to delete, or delete all after an anchor.</p>
                 <p>Compatible with Foundry VTT v11–v13. UI uses Application (v1) only.</p>`,
-      buttons: { ok: { label: "OK" } }
+      buttons: { ok: { label: "OK" } },
     }).render(true);
   }
 }
