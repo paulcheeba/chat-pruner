@@ -89,9 +89,8 @@ class ChatPrunerApp extends Application {
       const speaker = m?.speaker?.alias || m?.speaker?.actor || "—";
       const user = m?.user?.name ?? "Unknown";
 
-      // full (entire plain-text message) and preview (same text; CSS clamps to 2 lines)
       const fullText = stripHTMLSafe(m?.flavor || m?.content || "");
-      const previewText = fullText; // let CSS handle the 2-line clamp
+      const previewText = fullText; // CSS will clamp to 2 lines
 
       return {
         id: m?.id,
@@ -99,8 +98,8 @@ class ChatPrunerApp extends Application {
         ts,
         user,
         speaker,
-        content: previewText,
-        full: fullText,
+        content: previewText, // for on-screen preview
+        full: fullText,       // for native browser tooltip
         canDelete: canDeleteMessage(m, game.user),
       };
     });
@@ -137,50 +136,6 @@ class ChatPrunerApp extends Application {
     html.find("[data-action=deleteOlder]").on("click", () => this._deleteOlderThanAnchor(html));
     html.find("[data-action=refresh]").on("click", () => this.render(true));
     html.find("[data-action=about]").on("click", () => this._about());
-
-    // Tooltip: follow mouse showing full content (from data-full attr)
-    let tooltip = html.find("#cp-tooltip");
-    if (!tooltip.length) {
-      html.append('<div id="cp-tooltip"></div>');
-      tooltip = html.find("#cp-tooltip");
-    }
-    const OFFSET = 16;
-
-    function positionTooltip(ev) {
-      const tip = tooltip.get(0);
-      if (!tip) return;
-      // temporarily show to measure
-      tip.style.visibility = "hidden";
-      tip.classList.add("show");
-      const rect = tip.getBoundingClientRect();
-      tip.classList.remove("show");
-      tip.style.visibility = "";
-
-      const vw = window.innerWidth, vh = window.innerHeight;
-      let left = ev.clientX + OFFSET;
-      let top = ev.clientY + OFFSET;
-      if (left + rect.width + 8 > vw) left = ev.clientX - rect.width - OFFSET;
-      if (top + rect.height + 8 > vh) top = ev.clientY - rect.height - OFFSET;
-      tooltip.css({ left, top });
-    }
-
-    html.find(".cell.content").each(function () {
-      const $el = $(this);
-      // Use data-full only; DO NOT set title (avoids native browser tooltip)
-      const fullText = $el.attr("data-full") || $el.text();
-      if (!fullText) return;
-
-      $el
-        .on("mouseenter", function () {
-          tooltip.text(fullText).addClass("show");
-        })
-        .on("mousemove", function (ev) {
-          positionTooltip(ev);
-        })
-        .on("mouseleave", function () {
-          tooltip.removeClass("show");
-        });
-    });
   }
 
   async _deleteSelected(html) {
