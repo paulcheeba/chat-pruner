@@ -2,17 +2,17 @@
   <header class="pruner-head">
     <div class="left">
       <label title="Select/Deselect all">
-        <input id="fvtt-chat-pruner-select-all" type="checkbox"> Select All
+        <input id="pruner-select-all" type="checkbox"> Select All
       </label>
     </div>
     <div class="right">
-      <span>Showing last 200 messages (oldest → newest)</span>
+      <span>Showing last {{count}} messages (oldest → newest)</span>
     </div>
   </header>
 
   <ol class="pruner-list">
     {{#each rows as |row|}}
-    <li class="pruner-row fvtt-chat-pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}">
+    <li class="pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}">
       <div class="cells">
         <div class="cell cb">
           <input class="sel" type="checkbox" value="{{row.id}}" {{#unless row.canDelete}}disabled{{/unless}}>
@@ -37,9 +37,14 @@
   </ol>
 
   <footer class="pruner-foot">
-    <p>
-      <strong>Tips:</strong> Click a row to toggle its checkbox.  
-      Use the radio (●) to pick the “anchor” for <em>Delete After Anchor</em>.
+    <div class="btns">
+      <button type="button" data-action="deleteSelected"><i class="fas fa-trash"></i> Delete Selected</button>
+      <button type="button" data-action="deleteAfter"><i class="fas fa-forward"></i> Delete After Anchor</button>
+      <button type="button" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
+      <button type="button" data-action="about"><i class="fas fa-info-circle"></i> About</button>
+    </div>
+    <p class="tip">
+      Tip: Click a row to toggle its checkbox. Use the radio (●) to pick the “anchor” for <em>Delete After Anchor</em>.
     </p>
   </footer>
 </section>
