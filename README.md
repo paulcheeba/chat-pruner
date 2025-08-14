@@ -27,4 +27,3 @@ Chat Pruner is a GM-only tool for tidying up your game’s chat log.
 - The Preview shows up to two lines; hover to see the full message
 - The footer stays pinned so actions are always visible
 - Selected rows are highlighted for clarity
-- If you want a toggle between **Nord** and **Dracula** palettes, I can add a world setting and swap the CSS variables accordingly.
