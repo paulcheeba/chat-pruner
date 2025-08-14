@@ -108,7 +108,7 @@ class ChatPrunerApp extends Application {
     return text.length > 160 ? text.slice(0, 157) + "…" : (text || "(empty)");
   }
 
-  activateListeners(html) {
+    activateListeners(html) {
     super.activateListeners(html);
 
     // Row click toggles the checkbox unless clicking on controls
@@ -116,13 +116,21 @@ class ChatPrunerApp extends Application {
       if (["INPUT", "BUTTON", "LABEL", "A"].includes(ev.target.tagName)) return;
       const $row = $(ev.currentTarget);
       const $cb = $row.find("input.sel[type=checkbox]");
-      if ($cb.is(":enabled")) $cb.prop("checked", !$cb.prop("checked"));
+      if ($cb.is(":enabled")) {
+        $cb.prop("checked", !$cb.prop("checked")).trigger("change");
+      }
     });
 
     // Select all
     html.find("#pruner-select-all").on("change", (ev) => {
       const checked = ev.currentTarget.checked;
-      html.find("input.sel[type=checkbox]:enabled").prop("checked", checked);
+      html.find("input.sel[type=checkbox]:enabled").prop("checked", checked).trigger("change");
+    });
+
+    // Visual highlight when a row is selected
+    html.find("input.sel[type=checkbox]").on("change", (ev) => {
+      const $row = $(ev.currentTarget).closest(".pruner-row");
+      $row.toggleClass("is-selected", ev.currentTarget.checked);
     });
 
     // Buttons
@@ -132,6 +140,7 @@ class ChatPrunerApp extends Application {
     html.find("[data-action=refresh]").on("click", () => this.render(true));
     html.find("[data-action=about]").on("click", () => this._about());
   }
+
 
   async _deleteSelected(html) {
     const ids = html.find("input.sel[type=checkbox]:checked").map((_, el) => el.value).get();
