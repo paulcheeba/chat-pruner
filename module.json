@@ -1,29 +1,16 @@
 {
   "id": "fvtt-chat-pruner",
   "name": "fvtt-chat-pruner",
-  "title": "Chat Pruner (v11–v13, DialogV2 + Application v1)",
-  "description": "GM-only chat manager: select and delete chat messages, or delete everything after an anchor message. Uses DialogV2 with a legacy Application v1 About window.",
-  "version": "1.0.0",
-  "compatibility": {
-    "minimum": "11",
-    "verified": "13"
-  },
-  "authors": [
-    {
-      "name": "You"
-    }
-  ],
-  "esmodules": [
-    "module.js"
-  ],
-  "styles": [
-    "styles.css"
-  ],
-  "templates": [
-    "templates/chat-pruner.hbs"
-  ],
+  "title": "Chat Pruner (GM-only)",
+  "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (Application v1).",
+  "version": "1.2.0",
+  "compatibility": { "minimum": "11", "verified": "13" },
+  "authors": [{ "name": "Paul Cheeba" }],
+  "esmodules": ["module.js"],
+  "styles": ["styles.css"],
+  "templates": ["templates/chat-pruner.hbs"],
   "license": "MIT",
-  "url": "https://example.com",
-  "manifest": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json",
-  "download": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip"
+  "url": "https://github.com/paulcheeba/chat-pruner",
+  "manifest": "https://github.com/${REPO}/releases/latest/download/module.json",
+  "download": "https://github.com/${REPO}/releases/latest/download/chat-pruner.zip"
 }
