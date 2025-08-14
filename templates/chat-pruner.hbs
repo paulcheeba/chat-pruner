@@ -10,6 +10,14 @@
     </div>
   </header>
 
+  <!-- Column headers / descriptors -->
+  <div class="pruner-cols">
+    <div class="col cb">Select</div>
+    <div class="col anchor">Anchor</div>
+    <div class="col meta">Speaker / User / Time</div>
+    <div class="col content">Preview</div>
+  </div>
+
   <ol class="pruner-list">
     {{#each rows as |row|}}
     <li class="pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}">
@@ -39,12 +47,14 @@
   <footer class="pruner-foot">
     <div class="btns">
       <button type="button" data-action="deleteSelected"><i class="fas fa-trash"></i> Delete Selected</button>
-      <button type="button" data-action="deleteAfter"><i class="fas fa-forward"></i> Delete After Anchor</button>
+      <button type="button" data-action="deleteNewer"><i class="fas fa-forward"></i> Delete newer than anchor</button>
+      <button type="button" data-action="deleteOlder"><i class="fas fa-backward"></i> Delete older than anchor</button>
       <button type="button" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
       <button type="button" data-action="about"><i class="fas fa-info-circle"></i> About</button>
     </div>
     <p class="tip">
-      Tip: Click a row to toggle its checkbox. Use the radio (●) to pick the “anchor” for <em>Delete After Anchor</em>.
+      Tip: Click a row (not the controls) to toggle its checkbox.  
+      Use the radio (●) to choose the <strong>Anchor</strong> for the “newer/older than anchor” actions.
     </p>
   </footer>
 </section>
