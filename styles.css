@@ -1,6 +1,5 @@
 /* ================================
-   Chat Pruner — Dark Nord/Dracula
-   Scoped to .fvtt-chat-pruner
+   Chat Pruner
    ================================ */
 
 .fvtt-chat-pruner {
@@ -49,8 +48,8 @@
   top: 0;
   z-index: 1;
   display: grid;
-  /* give Preview the most space */
-  grid-template-columns: 40px 40px 180px 140px 1fr; /* Select / Anchor / Speaker / Time / Preview */
+  /* Select / Anchor / Speaker / Time / Preview */
+  grid-template-columns: 40px 40px 180px 140px 1fr;
   gap: 8px;
   align-items: center;
   padding: 8px 12px;
@@ -93,7 +92,7 @@
 .cell .user { color: var(--cp-muted); margin-left: 6px; }
 .cell .note { color: var(--cp-muted); font-style: italic; margin-left: 6px; }
 
-/* --- Preview: allow 2 lines with graceful ellipsis --- */
+/* --- Preview: allow 2 lines with graceful ellipsis; native tooltip on hover --- */
 .cell.content {
   white-space: normal;              /* allow wrapping */
   overflow: hidden;
@@ -144,22 +143,3 @@
 }
 
 .pruner-foot .tip { margin: 6px 0 0; font-size: 12px; color: var(--cp-muted); }
-
-/* --- Floating tooltip that follows the mouse --- */
-#cp-tooltip {
-  position: fixed;
-  background: #2b2b2b;
-  color: #eceff4;
-  padding: 6px 8px;
-  border-radius: 4px;
-  white-space: pre-wrap;
-  max-width: 480px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  opacity: 0;
-  pointer-events: none;
-  z-index: 9999;
-  transition: opacity 0.1s ease-in-out;
-  font-size: 13px;
-  line-height: 1.3;
-}
-#cp-tooltip.show { opacity: 1; }
