@@ -1,0 +1,45 @@
+<section class="pruner-wrap">
+  <header class="pruner-head">
+    <div class="left">
+      <label title="Select/Deselect all">
+        <input id="fvtt-chat-pruner-select-all" type="checkbox"> Select All
+      </label>
+    </div>
+    <div class="right">
+      <span>Showing last 200 messages (oldest → newest)</span>
+    </div>
+  </header>
+
+  <ol class="pruner-list">
+    {{#each rows as |row|}}
+    <li class="pruner-row fvtt-chat-pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}">
+      <div class="cells">
+        <div class="cell cb">
+          <input class="sel" type="checkbox" value="{{row.id}}" {{#unless row.canDelete}}disabled{{/unless}}>
+        </div>
+        <div class="cell anchor">
+          <input class="anchor" type="radio" name="anchor" value="{{row.id}}">
+        </div>
+        <div class="cell meta">
+          <div class="who">
+            <strong>{{row.speaker}}</strong>
+            <span class="user">({{row.user}})</span>
+          </div>
+          <div class="time">{{row.ts}}</div>
+        </div>
+        <div class="cell content" title="{{row.content}}">
+          {{row.content}}
+          {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
+        </div>
+      </div>
+    </li>
+    {{/each}}
+  </ol>
+
+  <footer class="pruner-foot">
+    <p>
+      <strong>Tips:</strong> Click anywhere on a row to toggle its checkbox.  
+      Use the radio (●) to pick the “anchor” for the <em>Delete After</em> action.
+    </p>
+  </footer>
+</section>
