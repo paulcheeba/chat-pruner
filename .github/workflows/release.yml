@@ -22,18 +22,10 @@ on:
         required: false
         default: "true"
         type: choice
-        options:
-          - "true"
-          - "false"
-          - "legacy"
+        options: [ "true", "false", "legacy" ]
 
 permissions:
   contents: write
-
-env:
-  FIXED_REPO: "paulcheeba/chat-pruner"
-  FIXED_MANIFEST_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json"
-  FIXED_DOWNLOAD_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip"
 
 jobs:
   build-and-release:
@@ -42,24 +34,34 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0   # needed to push a commit back to main
+          fetch-depth: 0
+
+      - name: Show context
+        run: |
+          echo "GITHUB_REPOSITORY=${GITHUB_REPOSITORY}"
+          echo "github.ref=${{ github.ref }}"
+          echo "github.ref_name=${{ github.ref_name }}"
+          echo "github.ref_type=${{ github.ref_type }}"
+          echo "inputs.version=${{ inputs.version }}"
 
       - name: Ensure jq & zip are available
         run: |
           sudo apt-get update
           sudo apt-get install -y jq zip
 
-      - name: Rewrite module.json (version, fixed manifest, fixed download)
+      - name: Validate module.json presence
+        run: |
+          test -f module.json || (echo "module.json not found at repo root." && exit 1)
+
+      - name: Rewrite module.json (version, manifest, download)
         shell: bash
         run: |
+          set -euo pipefail
+          REPO="${GITHUB_REPOSITORY}"
           VERSION="${{ inputs.version }}"
-          MANIFEST_URL="${FIXED_MANIFEST_URL}"
-          DOWNLOAD_URL="${FIXED_DOWNLOAD_URL}"
 
-          if [ ! -f module.json ]; then
-            echo "module.json not found at repo root. Exiting."
-            exit 1
-          fi
+          MANIFEST_URL="https://github.com/${REPO}/releases/latest/download/module.json"
+          DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/chat-pruner.zip"
 
           cp module.json module.json.bak
 
@@ -74,12 +76,13 @@ jobs:
 
           mv module.json.tmp module.json
 
-          echo "Updated module.json:"
+          echo "Updated module.json to version ${VERSION}:"
           cat module.json
 
-      - name: Commit updated module.json to main
+      - name: Commit updated module.json to main (if on main)
         if: ${{ endsWith(github.ref, '/main') }}
         run: |
+          set -e
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add module.json
@@ -93,10 +96,9 @@ jobs:
       - name: Build ZIP (chat-pruner.zip)
         shell: bash
         run: |
-          test -f module.json
+          set -euo pipefail
           ZIPNAME="chat-pruner.zip"
           rm -f "$ZIPNAME"
-
           # Create a clean ZIP with module files at the root.
           zip -r "$ZIPNAME" . \
             -x ".git/*" \
@@ -104,11 +106,16 @@ jobs:
                ".gitignore" \
                "docs/*" \
                ".DS_Store"
-
+          [ -f "$ZIPNAME" ] || (echo "ZIP was not produced." && exit 1)
           echo "ZIP contents:"
           unzip -l "$ZIPNAME"
 
-      - name: Create GitHub Release & Upload Assets
+      - name: Verify release assets exist
+        run: |
+          test -f chat-pruner.zip || (echo "chat-pruner.zip missing"; exit 1)
+          test -f module.json || (echo "module.json missing"; exit 1)
+
+      - name: Create/Update GitHub Release & Upload Assets
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ inputs.version }}
@@ -116,6 +123,7 @@ jobs:
           draft: ${{ inputs.draft }}
           prerelease: ${{ inputs.prerelease }}
           make_latest: ${{ inputs.make_latest }}
+          generate_release_notes: true
           files: |
             chat-pruner.zip
             module.json
