@@ -1,0 +1,104 @@
+name: Publish Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Module version (e.g. 1.1.0)"
+        required: true
+        type: string
+      prerelease:
+        description: "Mark as pre-release?"
+        required: false
+        default: false
+        type: boolean
+      draft:
+        description: "Create as draft?"
+        required: false
+        default: false
+        type: boolean
+      make_latest:
+        description: "Make this the 'latest' release? (true | false | legacy)"
+        required: false
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+          - "legacy"
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # needed to push a commit back to main
+
+      - name: Ensure jq & zip are available
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq zip
+
+      - name: Rewrite module.json (version, manifest, download)
+        shell: bash
+        run: |
+          REPO="${GITHUB_REPOSITORY}"
+          VERSION="${{ inputs.version }}"
+          MANIFEST_URL="https://github.com/${REPO}/releases/latest/download/module.json"
+          DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/chat-pruner.zip"
+
+          if [ ! -f module.json ]; then
+            echo "module.json not found at repo root. Exiting."
+            exit 1
+          fi
+
+          cp module.json module.json.bak
+
+          jq --arg v "$VERSION" \
+             --arg manifest "$MANIFEST_URL" \
+             --arg download "$DOWNLOAD_URL" \
+             '
+             .version = $v
+             | .manifest = $manifest
+             | .download = $download
+             ' module.json > module.json.tmp
+
+          mv module.json.tmp module.json
+
+          echo "Updated module.json:"
+          cat module.json
+
+      - name: Commit updated module.json to main
+        # Only commit back if we're on the main branch
+        if: ${{ endsWith(github.ref, '/main') }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add module.json
+          # Make the step no-op if nothing changed (re-runs)
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Release v${{ inputs.version }}: update module.json"
+            git push origin HEAD:main
+          fi
+
+      - name: Build ZIP (chat-pruner.zip)
+        shell: bash
+        run: |
+          test -f module.json
+          ZIPNAME="chat-pruner.zip"
+          rm -f "$ZIPNAME"
+
+          # Create a clean ZIP with module files at the root.
+          # Exclude VCS, workflows, and other non-distribution folders.
+          zip -r "$ZIPNAME" . \
+            -x ".git/*" \
+               ".github/*" \
+               ".gitignore" \
+               "docs/*" \
