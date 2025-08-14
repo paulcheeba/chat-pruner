@@ -1,31 +1,111 @@
-/* --- Layout tuning: give more space to Preview --- */
-.pruner-cols {
-  /* old: 40px 52px 240px 180px 1fr */
-  grid-template-columns: 40px 40px 180px 140px 1fr;
+/* ================================
+   Chat Pruner — Dark Nord/Dracula
+   Scoped to .fvtt-chat-pruner
+   ================================ */
+
+.fvtt-chat-pruner {
+  /* Nord-ish palette */
+  --cp-bg: #2e3440;          /* window bg */
+  --cp-surface: #3b4252;     /* surfaces / headers/footers */
+  --cp-surface-2: #434c5e;   /* hover / selected */
+  --cp-border: #4c566a;      /* borders */
+  --cp-text: #eceff4;        /* primary text */
+  --cp-subtext: #d8dee9;     /* secondary */
+  --cp-muted: #8f98a7;       /* muted */
+  --cp-accent: #88c0d0;      /* accent / focus */
+  --cp-danger: #bf616a;      /* delete buttons */
 }
 
-.pruner-row .cells {
-  /* match headers */
-  grid-template-columns: 40px 40px 180px 140px 1fr;
+.fvtt-chat-pruner .window-content {
+  padding: 0;
+  background: var(--cp-bg);
+  color: var(--cp-text);
 }
+
+/* Header / Footer */
+.pruner-head,
+.pruner-foot {
+  padding: 10px 12px;
+  background: var(--cp-surface);
+  color: var(--cp-subtext);
+}
+
+.pruner-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--cp-border);
+  font-size: 12px;
+}
+
+.pruner-foot {
+  border-top: 1px solid var(--cp-border);
+  border-bottom: none;
+}
+
+/* --- Column headers / descriptors --- */
+.pruner-cols {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: grid;
+  /* give Preview the most space */
+  grid-template-columns: 40px 40px 180px 140px 1fr; /* Select / Anchor / Speaker / Time / Preview */
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--cp-bg);
+  color: var(--cp-subtext);
+  border-bottom: 1px solid var(--cp-border);
+  font-size: 12px;
+  letter-spacing: 0.2px;
+}
+
+/* --- List & rows --- */
+.pruner-wrap { display: flex; flex-direction: column; height: 100%; }
+.pruner-list { list-style: none; padding: 0; margin: 0; overflow: auto; flex: 1 1 auto; }
+
+.pruner-row {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--cp-border);
+  background: var(--cp-bg);
+  transition: background 0.12s ease, border-color 0.12s ease;
+  cursor: pointer;
+}
+.pruner-row:hover { background: var(--cp-surface); }
+.pruner-row.locked { opacity: 0.75; }
+.pruner-row.is-selected { background: var(--cp-surface-2); }
+
+.pruner-row .cells {
+  display: grid;
+  grid-template-columns: 40px 40px 180px 140px 1fr; /* match header widths */
+  gap: 8px;
+  align-items: center;
+}
+
+/* --- Cells --- */
+.cell.time {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 12px;
+  color: var(--cp-subtext);
+}
+.cell.speaker .speaker-name { color: var(--cp-text); margin-right: 4px; }
+.cell .user { color: var(--cp-muted); margin-left: 6px; }
+.cell .note { color: var(--cp-muted); font-style: italic; margin-left: 6px; }
 
 /* --- Preview: allow 2 lines with graceful ellipsis --- */
 .cell.content {
-  white-space: normal;                  /* allow wrapping */
+  white-space: normal;              /* allow wrapping */
   overflow: hidden;
-  display: -webkit-box;                 /* line-clamp mechanism */
+  display: -webkit-box;             /* line-clamp mechanism */
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;                /* show up to 2 lines */
+  -webkit-line-clamp: 2;            /* show up to 2 lines */
   line-height: 1.25;
-  max-height: calc(1.25em * 2 + 2px);   /* clamps height to two lines */
+  max-height: calc(1.25em * 2 + 2px);
+  cursor: help;                     /* indicates hover help is available */
 }
 
-/* Slightly tighten speaker column so names don't push preview */
-.cell.speaker .speaker-name { margin-right: 4px; }
-
 /* --- Footer: stick to bottom to remove the “gap” feel --- */
-.pruner-wrap { display: flex; flex-direction: column; height: 100%; }
-.pruner-list { flex: 1 1 auto; }        /* list takes remaining height */
 .pruner-foot {
   position: sticky;
   bottom: 0;
@@ -33,5 +113,53 @@
   background-clip: padding-box;
 }
 
-/* Optional: softer separator so rows feel connected to footer */
-.pruner-row { border-bottom: 1px solid var(--cp-border); }
+.pruner-foot .btns {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.pruner-foot .spacer { flex: 1 1 auto; }
+
+.pruner-foot .btn {
+  appearance: none;
+  border: 1px solid var(--cp-border);
+  background: var(--cp-surface);
+  color: var(--cp-text);
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  transition: background .12s ease, border-color .12s ease, color .12s ease;
+}
+.pruner-foot .btn:hover { background: var(--cp-surface-2); border-color: var(--cp-accent); }
+.pruner-foot .btn:focus { outline: none; box-shadow: 0 0 0 2px color-mix(in srgb, var(--cp-accent) 35%, transparent); }
+.pruner-foot .btn.ghost { opacity: .9; }
+.pruner-foot .btn.primary {
+  border-color: color-mix(in srgb, var(--cp-danger) 60%, var(--cp-border));
+  background: color-mix(in srgb, var(--cp-danger) 25%, var(--cp-surface));
+}
+.pruner-foot .btn.primary:hover {
+  background: color-mix(in srgb, var(--cp-danger) 35%, var(--cp-surface-2));
+  border-color: var(--cp-danger);
+}
+
+.pruner-foot .tip { margin: 6px 0 0; font-size: 12px; color: var(--cp-muted); }
+
+/* --- Floating tooltip that follows the mouse --- */
+#cp-tooltip {
+  position: fixed;
+  background: #2b2b2b;
+  color: #eceff4;
+  padding: 6px 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  max-width: 480px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transition: opacity 0.1s ease-in-out;
+  font-size: 13px;
+  line-height: 1.3;
+}
+#cp-tooltip.show { opacity: 1; }
