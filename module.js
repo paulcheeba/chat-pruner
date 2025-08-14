@@ -88,22 +88,22 @@ class ChatPrunerApp extends Application {
       const when = ts ? new Date(ts).toLocaleString() : "";
       const speaker = m?.speaker?.alias || m?.speaker?.actor || "—";
       const user = m?.user?.name ?? "Unknown";
+
+      // full (entire plain-text message) and preview (same text; CSS clamps to 2 lines)
+      const fullText = stripHTMLSafe(m?.flavor || m?.content || "");
+      const previewText = fullText; // let CSS handle the 2-line clamp
+
       return {
         id: m?.id,
         when,
         ts,
         user,
         speaker,
-        content: this._summarize(m),
+        content: previewText,
+        full: fullText,
         canDelete: canDeleteMessage(m, game.user),
       };
     });
-  }
-
-  _summarize(msg) {
-    const html = msg?.flavor || msg?.content || "";
-    const text = stripHTMLSafe(html);
-    return text.length > 160 ? text.slice(0, 157) + "…" : (text || "(empty)");
   }
 
   activateListeners(html) {
@@ -139,20 +139,24 @@ class ChatPrunerApp extends Application {
     html.find("[data-action=about]").on("click", () => this._about());
 
     // Tooltip: follow mouse showing full content (from data-full attr)
-    const $tooltip = html.find("#cp-tooltip");
-    // Ensure tooltip exists even if the template was customized
-    if (!$tooltip.length) {
+    let tooltip = html.find("#cp-tooltip");
+    if (!tooltip.length) {
       html.append('<div id="cp-tooltip"></div>');
+      tooltip = html.find("#cp-tooltip");
     }
-    const tooltip = html.find("#cp-tooltip");
     const OFFSET = 16;
 
     function positionTooltip(ev) {
-      // Basic edge-avoidance: nudge left/up if near right/bottom
       const tip = tooltip.get(0);
       if (!tip) return;
-      const vw = window.innerWidth, vh = window.innerHeight;
+      // temporarily show to measure
+      tip.style.visibility = "hidden";
+      tip.classList.add("show");
       const rect = tip.getBoundingClientRect();
+      tip.classList.remove("show");
+      tip.style.visibility = "";
+
+      const vw = window.innerWidth, vh = window.innerHeight;
       let left = ev.clientX + OFFSET;
       let top = ev.clientY + OFFSET;
       if (left + rect.width + 8 > vw) left = ev.clientX - rect.width - OFFSET;
@@ -162,7 +166,8 @@ class ChatPrunerApp extends Application {
 
     html.find(".cell.content").each(function () {
       const $el = $(this);
-      const fullText = $el.attr("data-full") || $el.attr("title") || $el.text();
+      // Use data-full only; DO NOT set title (avoids native browser tooltip)
+      const fullText = $el.attr("data-full") || $el.text();
       if (!fullText) return;
 
       $el
