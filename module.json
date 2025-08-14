@@ -2,7 +2,7 @@
   "id": "fvtt-chat-pruner",
   "name": "fvtt-chat-pruner",
   "title": "Chat Pruner (v11–v13, DialogV2 + Application v1)",
-  "description": "Adds a button under the chat box to open a DialogV2 listing the last 200 chat messages for multi-select deletion, plus 'delete all after selected'.",
+  "description": "GM-only chat manager: select and delete chat messages, or delete everything after an anchor message. Uses DialogV2 with a legacy Application v1 About window.",
   "version": "1.0.0",
   "compatibility": { "minimum": "11", "verified": "13" },
   "authors": [{ "name": "You" }],
