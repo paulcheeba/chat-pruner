@@ -30,6 +30,11 @@ on:
 permissions:
   contents: write
 
+env:
+  FIXED_REPO: "paulcheeba/chat-pruner"
+  FIXED_MANIFEST_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json"
+  FIXED_DOWNLOAD_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip"
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -44,13 +49,12 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y jq zip
 
-      - name: Rewrite module.json (version, manifest, download)
+      - name: Rewrite module.json (version, fixed manifest, fixed download)
         shell: bash
         run: |
-          REPO="${GITHUB_REPOSITORY}"
           VERSION="${{ inputs.version }}"
-          MANIFEST_URL="https://github.com/${REPO}/releases/latest/download/module.json"
-          DOWNLOAD_URL="https://github.com/${REPO}/releases/latest/download/chat-pruner.zip"
+          MANIFEST_URL="${FIXED_MANIFEST_URL}"
+          DOWNLOAD_URL="${FIXED_DOWNLOAD_URL}"
 
           if [ ! -f module.json ]; then
             echo "module.json not found at repo root. Exiting."
@@ -74,13 +78,11 @@ jobs:
           cat module.json
 
       - name: Commit updated module.json to main
-        # Only commit back if we're on the main branch
         if: ${{ endsWith(github.ref, '/main') }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add module.json
-          # Make the step no-op if nothing changed (re-runs)
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
@@ -96,9 +98,26 @@ jobs:
           rm -f "$ZIPNAME"
 
           # Create a clean ZIP with module files at the root.
-          # Exclude VCS, workflows, and other non-distribution folders.
           zip -r "$ZIPNAME" . \
             -x ".git/*" \
                ".github/*" \
                ".gitignore" \
                "docs/*" \
+               ".DS_Store"
+
+          echo "ZIP contents:"
+          unzip -l "$ZIPNAME"
+
+      - name: Create GitHub Release & Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ inputs.version }}
+          name: v${{ inputs.version }}
+          draft: ${{ inputs.draft }}
+          prerelease: ${{ inputs.prerelease }}
+          make_latest: ${{ inputs.make_latest }}
+          files: |
+            chat-pruner.zip
+            module.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
