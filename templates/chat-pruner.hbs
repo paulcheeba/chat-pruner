@@ -35,11 +35,11 @@
             <span class="user">({{row.user}})</span>
           </div>
         </div>
-        <div class="cell time" title="{{row.ts}}">
+        <div class="cell time">
           {{row.when}}
         </div>
-        <!-- Add data-full so JS tooltip can show full text; keep title as fallback -->
-        <div class="cell content" title="{{row.content}}" data-full="{{row.content}}">
+        <!-- Use data-full ONLY (no title attr) to avoid native browser tooltip -->
+        <div class="cell content" data-full="{{row.full}}">
           {{row.content}}
           {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
         </div>
