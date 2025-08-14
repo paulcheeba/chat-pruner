@@ -25,7 +25,7 @@
             <strong>{{row.speaker}}</strong>
             <span class="user">({{row.user}})</span>
           </div>
-          <div class="time">{{row.ts}}</div>
+          <div class="time" title="{{row.ts}}">{{row.when}}</div>
         </div>
         <div class="cell content" title="{{row.content}}">
           {{row.content}}
@@ -38,8 +38,8 @@
 
   <footer class="pruner-foot">
     <p>
-      <strong>Tips:</strong> Click anywhere on a row to toggle its checkbox.  
-      Use the radio (●) to pick the “anchor” for the <em>Delete After</em> action.
+      <strong>Tips:</strong> Click a row to toggle its checkbox.  
+      Use the radio (●) to pick the “anchor” for <em>Delete After Anchor</em>.
     </p>
   </footer>
 </section>
