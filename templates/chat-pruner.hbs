@@ -1,7 +1,7 @@
 <section class="pruner-wrap">
   <header class="pruner-head">
     <div class="left">
-      <label title="Select/Deselect all">
+      <label title="Select/Deselect all" class="checkbox">
         <input id="pruner-select-all" type="checkbox"> Select All
       </label>
     </div>
@@ -14,7 +14,8 @@
   <div class="pruner-cols">
     <div class="col cb">Select</div>
     <div class="col anchor">Anchor</div>
-    <div class="col meta">Speaker / User / Time</div>
+    <div class="col speaker">Speaker</div>
+    <div class="col time">Time</div>
     <div class="col content">Preview</div>
   </div>
 
@@ -28,12 +29,14 @@
         <div class="cell anchor">
           <input class="anchor" type="radio" name="anchor" value="{{row.id}}">
         </div>
-        <div class="cell meta">
+        <div class="cell speaker">
           <div class="who">
-            <strong>{{row.speaker}}</strong>
+            <strong class="speaker-name">{{row.speaker}}</strong>
             <span class="user">({{row.user}})</span>
           </div>
-          <div class="time" title="{{row.ts}}">{{row.when}}</div>
+        </div>
+        <div class="cell time" title="{{row.ts}}">
+          {{row.when}}
         </div>
         <div class="cell content" title="{{row.content}}">
           {{row.content}}
@@ -46,15 +49,16 @@
 
   <footer class="pruner-foot">
     <div class="btns">
-      <button type="button" data-action="deleteSelected"><i class="fas fa-trash"></i> Delete Selected</button>
-      <button type="button" data-action="deleteNewer"><i class="fas fa-forward"></i> Delete newer than anchor</button>
-      <button type="button" data-action="deleteOlder"><i class="fas fa-backward"></i> Delete older than anchor</button>
-      <button type="button" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
-      <button type="button" data-action="about"><i class="fas fa-info-circle"></i> About</button>
+      <button type="button" class="btn primary" data-action="deleteSelected"><i class="fas fa-trash"></i> Delete Selected</button>
+      <button type="button" class="btn" data-action="deleteNewer"><i class="fas fa-forward"></i> Delete newer than anchor</button>
+      <button type="button" class="btn" data-action="deleteOlder"><i class="fas fa-backward"></i> Delete older than anchor</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
+      <button type="button" class="btn ghost" data-action="about"><i class="fas fa-info-circle"></i> About</button>
     </div>
     <p class="tip">
-      Tip: Click a row (not the controls) to toggle its checkbox.  
-      Use the radio (●) to choose the <strong>Anchor</strong> for the “newer/older than anchor” actions.
+      Tip: Click a row (not the controls) to toggle its checkbox. Use the radio (●) to choose the <strong>Anchor</strong> for the
+      “newer/older than anchor” actions.
     </p>
   </footer>
 </section>
