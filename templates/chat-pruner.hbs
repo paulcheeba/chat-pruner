@@ -38,8 +38,8 @@
         <div class="cell time">
           {{row.when}}
         </div>
-        <!-- Use data-full ONLY (no title attr) to avoid native browser tooltip -->
-        <div class="cell content" data-full="{{row.full}}">
+        <!-- Use native browser tooltip: put the FULL text in title -->
+        <div class="cell content" title="{{row.full}}">
           {{row.content}}
           {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
         </div>
@@ -62,7 +62,4 @@
       “newer/older than anchor” actions.
     </p>
   </footer>
-
-  <!-- Floating tooltip that follows the mouse -->
-  <div id="cp-tooltip"></div>
 </section>
