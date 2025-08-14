@@ -1,0 +1,20 @@
+/* Chat Pruner UI */
+.fvtt-chat-pruner-btnrow {
+  margin-top: 6px;
+}
+.fvtt-chat-pruner .window-content {
+  padding: 0;
+}
+.pruner-wrap { display: flex; flex-direction: column; height: 100%; }
+.pruner-head, .pruner-foot { padding: 8px 10px; background: var(--color-bg-alt, rgba(0,0,0,0.05)); }
+.pruner-head { display: flex; justify-content: space-between; align-items: center; }
+.pruner-list { list-style: none; padding: 0; margin: 0; overflow: auto; flex: 1 1 auto; }
+.pruner-row { border-bottom: 1px solid var(--color-border-light-2, rgba(0,0,0,0.1)); padding: 6px 8px; cursor: pointer; }
+.pruner-row:hover { background: var(--color-hover-bg, rgba(0,0,0,0.04)); }
+.pruner-row .cells { display: grid; grid-template-columns: 32px 32px 220px 1fr; gap: 8px; align-items: center; }
+.pruner-row .cell.meta .who { font-size: 12px; }
+.pruner-row .cell.meta .time { opacity: 0.6; font-size: 11px; }
+.pruner-row.locked { opacity: 0.6; }
+.pruner-row .cell.content { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.fvtt-chat-pruner-btn { width: 100%; margin-top: 4px; }
+.fvtt-chat-pruner-btn.ghost { opacity: 0.8; }
