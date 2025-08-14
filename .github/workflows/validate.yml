@@ -1,0 +1,70 @@
+name: Validate module.json
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+env:
+  FIXED_MANIFEST_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json"
+  FIXED_DOWNLOAD_URL: "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
+      - name: Validate module.json presence
+        run: |
+          if [ ! -f module.json ]; then
+            echo "module.json not found at repo root."
+            exit 1
+          fi
+
+      - name: Validate JSON syntax
+        run: jq empty module.json
+
+      - name: Validate keys & URLs
+        shell: bash
+        run: |
+          REQUIRED=( "id" "title" "version" "compatibility" )
+          for key in "${REQUIRED[@]}"; do
+            if [ "$(jq -r --arg k "$key" 'has($k)' module.json)" != "true" ]; then
+              echo "Missing required key: $key"
+              exit 1
+            fi
+          done
+
+          VERSION=$(jq -r '.version' module.json)
+          if ! [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-[A-Za-z0-9\.-]+)?$ ]]; then
+            echo "version must be SemVer (e.g., 1.2.3 or 1.2.3-beta). Found: $VERSION"
+            exit 1
+          fi
+
+          MANIFEST=$(jq -r '.manifest // empty' module.json)
+          DOWNLOAD=$(jq -r '.download // empty' module.json)
+
+          if [ -z "$MANIFEST" ] || [ -z "$DOWNLOAD" ]; then
+            echo "manifest and/or download missing in module.json"
+            exit 1
+          fi
+
+          if [ "$MANIFEST" != "$FIXED_MANIFEST_URL" ]; then
+            echo "manifest should be: $FIXED_MANIFEST_URL"
+            echo "found: $MANIFEST"
+            exit 1
+          fi
+
+          if [ "$DOWNLOAD" != "$FIXED_DOWNLOAD_URL" ]; then
+            echo "download should be: $FIXED_DOWNLOAD_URL"
+            echo "found: $DOWNLOAD"
+            exit 1
+          fi
+
+          echo "module.json looks good ✅"
