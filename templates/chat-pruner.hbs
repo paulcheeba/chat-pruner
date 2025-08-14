@@ -38,7 +38,8 @@
         <div class="cell time" title="{{row.ts}}">
           {{row.when}}
         </div>
-        <div class="cell content" title="{{row.content}}">
+        <!-- Add data-full so JS tooltip can show full text; keep title as fallback -->
+        <div class="cell content" title="{{row.content}}" data-full="{{row.content}}">
           {{row.content}}
           {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
         </div>
@@ -61,4 +62,7 @@
       “newer/older than anchor” actions.
     </p>
   </footer>
+
+  <!-- Floating tooltip that follows the mouse -->
+  <div id="cp-tooltip"></div>
 </section>
