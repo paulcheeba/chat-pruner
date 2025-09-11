@@ -1,11 +1,13 @@
 // fvtt-chat-pruner — GM-only chat pruning tool (v11–v13) — Application (v1) only
 const MOD = "fvtt-chat-pruner";
 
-// Add a Chat Pruner button under the Journal/Notes toolbar (v13-safe) - This code works but throws an error
+// Add a Chat Pruner button under the Journal/Notes toolbar (v13-safe, single handler)
 Hooks.on("getSceneControlButtons", (controls) => {
   // v13: controls is a record; Journal Notes is typically "notes"
   const notes = controls?.notes ?? controls?.journal;
   if (!notes) return;
+
+  const openPruner = () => game.modules.get("fvtt-chat-pruner")?.api?.open?.();
 
   // Define the tool once
   const tool = {
@@ -14,17 +16,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
     icon: "fa-regular fa-hand-scissors",
     button: true,
     visible: game.user?.isGM === true,
-    // v13 expects onChange/onClick; keep both for safety
-    onChange: () => game.modules.get("fvtt-chat-pruner")?.api?.open?.(),
-    onClick: () => game.modules.get("fvtt-chat-pruner")?.api?.open?.(),
+    onClick: openPruner,   // ← only onClick
     order: 999
   };
 
   // v13: tools is a record; pre-v13: array. Handle both additively.
   if (Array.isArray(notes.tools)) {
     // Pre-v13 compatibility (array)
-    const exists = notes.tools.some(t => t.name === tool.name);
-    if (!exists) notes.tools.push(tool);
+    if (!notes.tools.some(t => t.name === tool.name)) notes.tools.push(tool);
   } else {
     // v13 (record/object)
     notes.tools ??= {};
