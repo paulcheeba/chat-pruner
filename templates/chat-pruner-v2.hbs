@@ -1,0 +1,25 @@
+<section class="cpv2-wrap">
+  <header class="cpv2-header">
+    <i class="fa-regular fa-hand-scissors"></i>
+    <h2>Chat Pruner (V2)</h2>
+    <div class="cpv2-count">Showing last {{count}} message(s)</div>
+  </header>
+
+  <div class="cpv2-table">
+    <div class="cpv2-row cpv2-head">
+      <div class="c-when">When</div>
+      <div class="c-user">User</div>
+      <div class="c-speaker">Speaker</div>
+      <div class="c-preview">Preview</div>
+    </div>
+
+    {{#each rows}}
+      <div class="cpv2-row">
+        <div class="c-when" title="{{this.ts}}">{{this.when}}</div>
+        <div class="c-user">{{this.user}}</div>
+        <div class="c-speaker">{{this.speaker}}</div>
+        <div class="c-preview" title="{{this.preview}}">{{this.preview}}</div>
+      </div>
+    {{/each}}
+  </div>
+</section>
