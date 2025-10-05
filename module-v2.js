@@ -1,73 +1,324 @@
-// Chat Pruner — Application V2 (additive, keeps v1 intact)
-const MOD = "fvtt-chat-pruner";
-
-/**
- * Minimal V2 shell: opens a window and lists the last 200 messages (read-only for now).
- * We’ll keep behavior lean until you approve further features.
+/* Chat-Pruner — ApplicationV2 rewrite
+ * Version: v13.1.3.6
+ * License: MIT
+ *
+ * Notes:
+ * - ApplicationV2 + HandlebarsApplicationMixin scaffold, no refactors outside this file.
+ * - Keeps v1 features: preview, anchor filters, selection, GM-gated bulk delete.
+ * - Theme: inherits Foundry ThemeV2. CSS uses core variables; no custom theme switch here.
+ * - Fade when unfocused: toggles data-inactive on the app root; styles.css handles opacity.
+ *
+ * References:
+ * - AppV2 & HandlebarsApplicationMixin: https://foundryvtt.com/api/classes/foundry.applications.api.ApplicationV2.html
+ * - HandlebarsApplicationMixin: https://foundryvtt.com/api/functions/foundry.applications.api.HandlebarsApplicationMixin.html
+ * - Conversion guide: https://foundryvtt.wiki/en/development/guides/converting-to-appv2
+ * - ChatMessage deletion API: https://foundryvtt.com/api/classes/foundry.documents.ChatMessage.html
  */
-class ChatPrunerAppV2 extends ApplicationV2 {
-  static DEFAULT_OPTIONS = {
-    id: "fvtt-chat-pruner-v2",
-    window: {
+
+// Guard multiple registrations.
+if (!globalThis.ChatPrunerV2) {
+  const { ApplicationV2 } = foundry.applications.api;
+  const { HandlebarsApplicationMixin } = foundry.applications.api;
+
+  /** @typedef {import("foundry.js").foundry.documents.ChatMessage} ChatMessage */
+
+  /**
+   * ChatPrunerV2 — modern AppV2 UI for pruning chat messages.
+   */
+  class _ChatPrunerV2 extends HandlebarsApplicationMixin(ApplicationV2) {
+    static DEFAULT_OPTIONS = {
+      id: "chat-pruner-v2",
+      classes: ["window-app", "cp-app", "chat-pruner", "app-v2"],
       title: "Chat Pruner (V2)",
-      icon: "fa-regular fa-hand-scissors"
-    },
-    tag: "section",
-    classes: ["fvtt-chat-pruner", "fvtt-chat-pruner-v2"],
-    position: { width: 640, height: 480, top: null, left: null },
-    template: `modules/${MOD}/templates/chat-pruner-v2.hbs`
-  };
-
-  /** V2 lifecycle — provide data to the template */
-  async _prepareContext(_options = {}) {
-    // NOTE: Read-only view for now; mirrors v1’s “last 200 messages” list, formatted minimally.
-    const LIMIT = 200;
-    const all = Array.from(game.messages?.values?.() ?? []);
-    // Sort oldest → newest to match v1’s anchor-friendly order
-    all.sort((a, b) => a.timestamp - b.timestamp);
-    const last = all.slice(-LIMIT);
-
-    // Shape a simple read-only view (no delete; we’ll add actions only after approval)
-    const rows = last.map(m => ({
-      id: m.id,
-      ts: m.timestamp,
-      when: new Date(m.timestamp).toLocaleString(),
-      user: m.user?.name ?? "—",
-      speaker: m.speaker?.alias ?? m.speaker?.actor ?? "—",
-      preview: (m.flavor || m.content || "").replace(/<[^>]+>/g, "").slice(0, 140)
-    }));
-
-    return {
-      count: rows.length,
-      rows
+      position: { width: 720, height: "auto" },
+      resizable: true,
+      // Template frame stays as your existing v2 template; we render data via contexts/partials.
+      template: "modules/fvtt-chat-pruner/templates/chat-pruner-v2.hbs",
+      // Parts: these names must match {{#*inline}} blocks or partials in the template if used.
+      parts: {
+        controls: { template: null },   // using single template for now; can split later
+        list:     { template: null },
+        footer:   { template: null }
+      },
+      // Scrollers we preserve between renders
+      scrollY: [".cp-list"],
     };
-  }
 
-  /** Optional: local listeners (none yet; keep minimal) */
-  activateListeners(html) {
-    super.activateListeners(html);
-    // Future additive actions go here (e.g., open v1 from v2, dry-run, filters). Keeping empty per your request.
-  }
+    /** Internal state kept out of the template source-of-truth. */
+    #state = {
+      anchorMode: "older",     // "older" | "newer"
+      anchorId: null,          // ChatMessage id used as anchor
+      includeWhispers: false,
+      includeRolls: true,
+      includeSystem: true,
+      selectedIds: new Set(),  // Selected message ids to prune
+      limit: 200,              // Safety: initial listing limit
+      query: "",               // (future) free-text filter
+    };
 
-  /** Convenience static to open V2 */
-  static open() {
-    if (!game.user?.isGM) {
-      ui.notifications?.warn(game.i18n?.localize?.("Only a GM can open Chat Pruner.") ?? "GM only.");
-      return;
+    /** Return a lid-safe display name. */
+    static get appName() { return "ChatPrunerV2"; }
+
+    /** Convenience getter. */
+    get isGM() { return game.user?.isGM; }
+
+    /** First render wiring (focus/blur, keybinds, etc.) */
+    onFirstRender(html) {
+      // Focus/blur fade: use capture to track focus within the window.
+      const root = html[0];
+      const setInactive = (inactive) => {
+        if (inactive) root.setAttribute("data-inactive", "true");
+        else root.removeAttribute("data-inactive");
+      };
+      // Consider the app "active" when any element inside has focus.
+      const onFocusIn = () => setInactive(false);
+      const onFocusOut = (ev) => {
+        // If the newly focused element is outside our app, mark inactive.
+        if (!root.contains(ev.relatedTarget)) setInactive(true);
+      };
+
+      root.addEventListener("focusin", onFocusIn);
+      root.addEventListener("focusout", onFocusOut);
+
+      // Keep references to clean up.
+      this._cp_focusHandlers = { onFocusIn, onFocusOut, root };
+
+      // Start inactive if it didn't auto-focus.
+      // AppV2 sometimes focuses the header; if not, set to inactive initially.
+      queueMicrotask(() => {
+        const hasFocusInside = root.contains(document.activeElement);
+        setInactive(!hasFocusInside);
+      });
     }
-    const existing = ui.windows?.find?.(w => w?.appId && w.options?.id === this.DEFAULT_OPTIONS.id);
-    if (existing) return existing.bringToTop();
-    const app = new this();
-    app.render(true);
-    return app;
+
+    /** Cleanup listeners we created. */
+    onClose() {
+      if (this._cp_focusHandlers) {
+        const { root, onFocusIn, onFocusOut } = this._cp_focusHandlers;
+        root.removeEventListener("focusin", onFocusIn);
+        root.removeEventListener("focusout", onFocusOut);
+      }
+      this._cp_focusHandlers = null;
+    }
+
+    /** Prepare context for the template on each render. */
+    async _prepareContext(_options) {
+      const ctx = {};
+      // Pull raw messages (limited for UI)
+      const coll = game.messages; // WorldCollection<ChatMessage>
+      /** @type {ChatMessage[]} */
+      const all = coll.contents;
+
+      // Filters based on state.
+      const {
+        anchorMode, anchorId, includeWhispers, includeRolls, includeSystem, limit, query
+      } = this.#state;
+
+      // Build candidate list
+      let anchorIndex = -1;
+      if (anchorId) {
+        anchorIndex = all.findIndex((m) => m.id === anchorId);
+      }
+
+      /** Helper predicates */
+      const isWhisper = (m) => Array.isArray(m.whisper) && m.whisper.length > 0;
+      const isRoll = (m) => !!m.rolls?.length || m.flags?.core?.roll;
+      const isSystemMsg = (m) =>
+        m.type === CONST.CHAT_MESSAGE_TYPES.OTHER ||
+        m.type === CONST.CHAT_MESSAGE_TYPES.OOC && m.user?.isGM && !m.speaker?.actor;
+
+      /** Optional text query (basic) */
+      const matchesQuery = (m) => {
+        if (!query) return true;
+        const text = String(m.content || "").toLowerCase();
+        return text.includes(query.toLowerCase());
+      };
+
+      // Range select by anchor
+      let candidates = all;
+      if (anchorId !== null && anchorIndex >= 0) {
+        candidates = (anchorMode === "older")
+          ? all.slice(0, anchorIndex)          // strictly older than anchor
+          : all.slice(anchorIndex + 1);        // strictly newer than anchor
+      }
+
+      // Type filters
+      candidates = candidates.filter((m) => {
+        if (!includeWhispers && isWhisper(m)) return false;
+        if (!includeRolls && isRoll(m)) return false;
+        if (!includeSystem && isSystemMsg(m)) return false;
+        return matchesQuery(m);
+      });
+
+      // Safety cap, newest-first by default (Foundry stores in creation order)
+      // We'll present reverse chronological.
+      candidates = candidates.slice(-limit);
+
+      // Compose context
+      ctx.isGM = this.isGM;
+      ctx.count = candidates.length;
+      ctx.anchorMode = anchorMode;
+      ctx.anchorId = anchorId;
+      ctx.limit = limit;
+      ctx.query = query;
+      ctx.includeWhispers = includeWhispers;
+      ctx.includeRolls = includeRolls;
+      ctx.includeSystem = includeSystem;
+
+      // Project minimal info for the list (keep template lean)
+      ctx.messages = candidates
+        .map((m) => ({
+          id: m.id,
+          ts: m.timestamp,
+          author: m.alias ?? m.user?.name ?? "—",
+          whisper: isWhisper(m),
+          roll: !!m.rolls?.length,
+          system: isSystemMsg(m),
+          content: m.content, // safe: Foundry already sanitizes for display in chat
+          selected: this.#state.selectedIds.has(m.id),
+        }))
+        .reverse(); // newest at top
+
+      // Footer selections
+      ctx.selectedCount = this.#state.selectedIds.size;
+      ctx.canDelete = this.isGM && ctx.selectedCount > 0;
+
+      return ctx;
+    }
+
+    /* ---------------------------------------- */
+    /* Event handling                            */
+    /* ---------------------------------------- */
+
+    /** Declarative action dispatch (clicks) */
+    _onClickAction(event) {
+      const button = event.currentTarget;
+      const action = button?.dataset?.action;
+      if (!action) return;
+
+      switch (action) {
+        case "cp.setAnchor":
+          this._actionSetAnchor(button.dataset.id);
+          break;
+        case "cp.toggleMode":
+          this._actionToggleMode();
+          break;
+        case "cp.toggle":
+          this._actionToggle(button.dataset.id);
+          break;
+        case "cp.selectAll":
+          this._actionSelectAll(true);
+          break;
+        case "cp.selectNone":
+          this._actionSelectAll(false);
+          break;
+        case "cp.delete":
+          this._actionDeleteSelected();
+          break;
+        default:
+          // no-op
+          break;
+      }
+    }
+
+    /** Declarative change handling (checkboxes, inputs) */
+    _onChangeForm(_event, formData) {
+      // HandlebarsApplication collects values into formData
+      // Expect keys: includeWhispers/includeRolls/includeSystem/limit/query
+      const { includeWhispers, includeRolls, includeSystem, limit, query } = formData;
+      // Normalize booleans and numbers; AppV2 form handling already gives them reasonably typed.
+      this.#state.includeWhispers = !!includeWhispers;
+      this.#state.includeRolls = !!includeRolls;
+      this.#state.includeSystem = !!includeSystem;
+      this.#state.limit = Math.max(10, Number(limit) || 200);
+      this.#state.query = String(query ?? "");
+
+      // Re-render list & footer for snappy UX.
+      this.render({ parts: ["list", "footer"] });
+    }
+
+    /* ---------------------------------------- */
+    /* Actions                                   */
+    /* ---------------------------------------- */
+
+    _actionSetAnchor(id) {
+      this.#state.anchorId = id ?? null;
+      this.render({ parts: ["list", "footer"] });
+    }
+
+    _actionToggleMode() {
+      this.#state.anchorMode = this.#state.anchorMode === "older" ? "newer" : "older";
+      this.render({ parts: ["list", "footer"] });
+    }
+
+    _actionToggle(id) {
+      if (!id) return;
+      if (this.#state.selectedIds.has(id)) this.#state.selectedIds.delete(id);
+      else this.#state.selectedIds.add(id);
+      this.render({ parts: ["list", "footer"] });
+    }
+
+    _actionSelectAll(flag) {
+      // Select/deselect all currently visible messages in context
+      const current = this.element?.querySelectorAll?.(".cp-list [data-id]");
+      if (!current?.length) return;
+      for (const row of current) {
+        const id = row.dataset.id;
+        if (flag) this.#state.selectedIds.add(id);
+        else this.#state.selectedIds.delete(id);
+      }
+      this.render({ parts: ["list", "footer"] });
+    }
+
+    async _actionDeleteSelected() {
+      if (!this.isGM) {
+        ui.notifications?.warn("Chat-Pruner: Only the GM may delete messages.");
+        return;
+      }
+      const ids = [...this.#state.selectedIds];
+      if (!ids.length) return;
+
+      // Confirm via DialogV2
+      const { DialogV2 } = foundry.applications.api;
+      const confirmed = await DialogV2.confirm({
+        window: { title: "Delete Selected Chat Messages?" },
+        content: `<p>Delete <strong>${ids.length}</strong> message(s)? This cannot be undone.</p>`,
+        rejectClose: false
+      });
+      if (!confirmed) return;
+
+      try {
+        // Bulk delete via ChatMessage static API
+        await foundry.documents.ChatMessage.deleteDocuments(ids);
+        // Clear selection and refresh.
+        this.#state.selectedIds.clear();
+        this.render();
+      } catch (err) {
+        console.error("Chat-Pruner V2 deletion failed:", err);
+        ui.notifications?.error("Chat-Pruner: Failed to delete selected messages. See console.");
+      }
+    }
+
+    /* ---------------------------------------- */
+    /* Wiring                                    */
+    /* ---------------------------------------- */
+
+    /** Map data-action click targets inside the app */
+    activateListeners(html) {
+      super.activateListeners(html);
+      html.on("click", "[data-action]", this._onClickAction.bind(this));
+    }
   }
+
+  // Expose globally for macro usage.
+  globalThis.ChatPrunerV2 = _ChatPrunerV2;
 }
 
-// Expose as an additive API without touching the v1 init/ready blocks
-Hooks.once("ready", () => {
-  const mod = game.modules.get(MOD);
-  if (!mod) return;
-  mod.api ??= {};
-  // Add new entry point alongside existing v1 `api.open`
-  mod.api.openV2 = () => ChatPrunerAppV2.open();
-});
+/**
+ * Utility: Open the Chat Pruner V2 window (for macros/toolbar).
+ */
+export function openChatPrunerV2() {
+  const App = globalThis.ChatPrunerV2;
+  const app = new App();
+  return app.render(true);
+}
