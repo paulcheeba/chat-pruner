@@ -2,6 +2,24 @@
    Chat Pruner
    ================================ */
 
+/* Chat-Pruner V2 additions — v13.1.3.6
+   Keep visuals aligned with Foundry's ThemeV2.
+   We do not force colors; we defer to core variables and user theme. */
+.cp-app {
+  transition: opacity 160ms ease-in-out, filter 160ms ease-in-out;
+}
+
+/* When the AppV2 window loses focus, module-v2.js toggles data-inactive.
+   We gently fade it to keep attention on the active window. */
+.cp-app[data-inactive="true"] {
+  opacity: 0.75;
+  filter: saturate(0.96);
+}
+
+/* Optional: ensure text uses theme variables */
+.cp-app { color: var(--color-text); }
+.cp-app .window-content { background: var(--color-bg); }
+
 .fvtt-chat-pruner {
   /* Nord-ish palette */
   --cp-bg: #2e3440;          /* window bg */
