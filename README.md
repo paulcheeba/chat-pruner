@@ -16,10 +16,8 @@ Chat Pruner is a GM-only tool for tidying up your game’s chat log.
 
 ## How to use it
 
-1. Create a **Macro** with this code and run it as GM:
-   ```js
-   game.modules.get('fvtt-chat-pruner')?.api?.open();
-   ```
+1. Click the Chat Pruner toolbar icon to open Chat Pruner (_located at toolbars > journal/notes > chat pruner_)
+
 2- In the window:
 - Use checkboxes to select and Delete Selected
 - Pick a radio button to set the Anchor, then delete newer or older than it
