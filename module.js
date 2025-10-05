@@ -1,4 +1,6 @@
 // fvtt-chat-pruner — GM-only chat pruning tool (v11–v13) — Application (v1) only
+// Version: v13.1.3.8
+
 const MOD = "fvtt-chat-pruner";
 
 // Add a Chat Pruner button under the Journal/Notes toolbar (v13-safe, single handler)
@@ -81,7 +83,7 @@ async function deleteMessagesByIds(ids) {
 }
 
 Hooks.once("init", async () => {
-  await loadTemplates([`modules/${MOD}/templates/chat-pruner.hbs`]);
+  await foundry.applications.handlebars.loadTemplates([`modules/${MOD}/templates/chat-pruner.hbs`]);
 });
 
 Hooks.once("ready", () => {
@@ -128,7 +130,7 @@ class ChatPrunerApp extends Application {
       const ts = m?.timestamp ?? m?._source?.timestamp ?? 0;
       const when = ts ? new Date(ts).toLocaleString() : "";
       const speaker = m?.speaker?.alias || m?.speaker?.actor || "—";
-      const user = m?.user?.name ?? "Unknown";
+      const user = m?.author?.name ?? "Unknown";
 
       const fullText = stripHTMLSafe(m?.flavor || m?.content || "");
       const previewText = fullText; // CSS will clamp to 2 lines
