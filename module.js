@@ -7,7 +7,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
   const notes = controls?.notes ?? controls?.journal;
   if (!notes) return;
 
-  const openPruner = () => game.modules.get("fvtt-chat-pruner")?.api?.open?.();
+  // Debounced opener to avoid double-firing across cores
+  let _lastRun = 0;
+  const _openOnce = () => {
+    const now = Date.now();
+    if (now - _lastRun < 250) return;
+    _lastRun = now;
+    game.modules.get("fvtt-chat-pruner")?.api?.open?.();
+  };
 
   // Define the tool once
   const tool = {
@@ -16,14 +23,18 @@ Hooks.on("getSceneControlButtons", (controls) => {
     icon: "fa-regular fa-hand-scissors",
     button: true,
     visible: game.user?.isGM === true,
-    onClick: openPruner,   // ← only onClick
+    // v13.350+ expects onChange(event, active); invoke only when active
+    onChange: (_event, active) => { if (active) _openOnce(); },
+    // Older cores may still call onClick; keep as fallback without double-triggering
+    onClick: _openOnce,
     order: 999
   };
 
   // v13: tools is a record; pre-v13: array. Handle both additively.
   if (Array.isArray(notes.tools)) {
     // Pre-v13 compatibility (array)
-    if (!notes.tools.some(t => t.name === tool.name)) notes.tools.push(tool);
+    const exists = notes.tools.some(t => t.name === tool.name);
+    if (!exists) notes.tools.push(tool);
   } else {
     // v13 (record/object)
     notes.tools ??= {};
