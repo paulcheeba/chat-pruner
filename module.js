@@ -23,11 +23,11 @@ Hooks.on("getSceneControlButtons", (controls) => {
     icon: "fa-regular fa-hand-scissors",
     button: true,
     visible: game.user?.isGM === true,
-    // v13.350+ expects onChange(event, active); invoke only when active
-    onChange: (_event, active) => { if (active) _openOnce(); },
-    // Older cores may still call onClick; keep as fallback without double-triggering
+    // v13.350+ uses onChange; run regardless of 'active' per official example
+    onChange: () => { _openOnce(); },    // Older cores may still call onClick; keep as fallback without double-triggering
     onClick: _openOnce,
-    order: 999
+    // Place at bottom of the tool list to avoid reordering issues
+    order: Array.isArray(notes.tools) ? notes.tools.length : Object.keys(notes.tools ?? {}).length
   };
 
   // v13: tools is a record; pre-v13: array. Handle both additively.
