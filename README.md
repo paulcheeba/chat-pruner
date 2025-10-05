@@ -1,3 +1,5 @@
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/paulcheeba/chat-pruner?sort=semver) <!-- Total downloads across all releases -->![Downloads](https://img.shields.io/github/downloads/paulcheeba/chat-pruner/total) <!-- Downloads of latest release only -->![Downloads (latest)](https://img.shields.io/github/downloads/paulcheeba/chat-pruner/latest/total)
+
 # Chat Pruner
 
 Chat Pruner is a GM-only tool for tidying up your game’s chat log.
