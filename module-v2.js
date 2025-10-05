@@ -1,5 +1,5 @@
 /* Chat-Pruner — ApplicationV2 rewrite
- * Version: v13.1.3.7
+ * Version: v13.1.3.8
  * License: MIT
  *
  * Notes:
@@ -32,14 +32,8 @@ if (!globalThis.ChatPrunerV2) {
       title: "Chat Pruner (V2)",
       position: { width: 720, height: "auto" },
       resizable: true,
-      // Template frame stays as your existing v2 template; we render data via contexts/partials.
-      template: "modules/fvtt-chat-pruner/templates/chat-pruner-v2.hbs",
-      // Parts: these names must match {{#*inline}} blocks or partials in the template if used.
-      parts: {
-        controls: { template: null },   // using single template for now; can split later
-        list:     { template: null },
-        footer:   { template: null }
-      },
+      // Single full template for now; no AppV2 "parts" until we split later.
+      
       // Scrollers we preserve between renders
       scrollY: [".cp-list"],
     };
@@ -233,8 +227,8 @@ if (!globalThis.ChatPrunerV2) {
       this.#state.limit = Math.max(10, Number(limit) || 200);
       this.#state.query = String(query ?? "");
 
-      // Re-render list & footer for snappy UX.
-      this.render({ parts: ["list", "footer"] });
+      // For now we re-render the whole template. We can switch to parts later.
+      this.render();
     }
 
     /* ---------------------------------------- */
@@ -243,19 +237,19 @@ if (!globalThis.ChatPrunerV2) {
 
     _actionSetAnchor(id) {
       this.#state.anchorId = id ?? null;
-      this.render({ parts: ["list", "footer"] });
+      this.render();
     }
 
     _actionToggleMode() {
       this.#state.anchorMode = this.#state.anchorMode === "older" ? "newer" : "older";
-      this.render({ parts: ["list", "footer"] });
+      this.render();
     }
 
     _actionToggle(id) {
       if (!id) return;
       if (this.#state.selectedIds.has(id)) this.#state.selectedIds.delete(id);
       else this.#state.selectedIds.add(id);
-      this.render({ parts: ["list", "footer"] });
+      this.render();
     }
 
     _actionSelectAll(flag) {
@@ -267,7 +261,7 @@ if (!globalThis.ChatPrunerV2) {
         if (flag) this.#state.selectedIds.add(id);
         else this.#state.selectedIds.delete(id);
       }
-      this.render({ parts: ["list", "footer"] });
+      this.render();
     }
 
     async _actionDeleteSelected() {
@@ -307,6 +301,27 @@ if (!globalThis.ChatPrunerV2) {
     activateListeners(html) {
       super.activateListeners(html);
       html.on("click", "[data-action]", this._onClickAction.bind(this));
+
+      // Wire filter form changes to _onChangeForm.
+      // We’re not using FormApplicationV2, so gather values manually.
+      const form = html[0]?.querySelector?.(".cp-filters");
+      if (form) {
+        const onChange = (ev) => {
+          // Build a minimal formData object with the fields we care about.
+          const data = {
+            includeWhispers: !!form.querySelector('input[name="includeWhispers"]')?.checked,
+            includeRolls:    !!form.querySelector('input[name="includeRolls"]')?.checked,
+            includeSystem:   !!form.querySelector('input[name="includeSystem"]')?.checked,
+            limit:           Number(form.querySelector('input[name="limit"]')?.value ?? 200),
+            query:           String(form.querySelector('input[name="query"]')?.value ?? ""),
+          };
+          this._onChangeForm(ev, data);
+        };
+        form.addEventListener("change", onChange);
+        form.addEventListener("input", onChange);
+        // Store for cleanup if needed later.
+        this._cp_formHandler = { form, onChange };
+      }
     }
   }
 
