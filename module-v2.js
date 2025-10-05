@@ -1,5 +1,5 @@
 /* Chat-Pruner — ApplicationV2 rewrite
- * Version: v13.1.3.6
+ * Version: v13.1.3.7
  * License: MIT
  *
  * Notes:
@@ -312,6 +312,29 @@ if (!globalThis.ChatPrunerV2) {
 
   // Expose globally for macro usage.
   globalThis.ChatPrunerV2 = _ChatPrunerV2;
+}
+
+/**
+ * ------------------------------------------------------------
+ * Handlebars helpers for Chat-Pruner V2
+ * ------------------------------------------------------------
+ * These helpers are registered once on module load. They are
+ * safe to call multiple times; registration overwrites quietly.
+ */
+
+// Human-readable timestamp (local)
+if (typeof Handlebars !== "undefined") {
+  Handlebars.registerHelper("timestamp", function(ts) {
+    try {
+      const date = new Date(ts);
+      return date.toLocaleString();
+    } catch {
+      return ts;
+    }
+  });
+
+  // Negation helper: {{#if (not var)}}{{/if}}
+  Handlebars.registerHelper("not", (v) => !v);
 }
 
 /**
