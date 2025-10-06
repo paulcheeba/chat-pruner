@@ -32,8 +32,9 @@ if (!globalThis.ChatPrunerV2) {
       title: "Chat Pruner (V2)",
       position: { width: 720, height: "auto" },
       resizable: true,
-      // Single full template for now; no AppV2 "parts" until we split later.
-      
+      // AppV2 + Handlebars needs a template; without it the window renders empty.
+      // NOTE: keep this path in sync with your module id & folder structure.
+      template: "modules/fvtt-chat-pruner/templates/chat-pruner-v2.hbs",      
       // Scrollers we preserve between renders
       scrollY: [".cp-list"],
     };
