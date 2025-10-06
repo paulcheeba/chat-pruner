@@ -1,11 +1,7 @@
 {{!-- /templates/templateAppV2.hbs --}}
 {{!--
-  A single Handlebars template for our AppV2 PARTS.body.
-  Shows:
-    - Tabs (Overview, Actions, Form, Enrichment)
-    - An #each list
-    - Buttons with data-action
-    - A demo form with submit wired to actions map
+  NOTE: AppV2 PARTS must render a SINGLE top-level element.
+  We wrap everything in one <section> and keep <style> INSIDE it.
 --}}
 
 <section class="template-appv2-root">
@@ -113,13 +109,15 @@
       </button>
     </div>
   </div>
-</section>
 
-<style>
-  .template-appv2-root { padding: 0.5rem 0.75rem; }
-  .template-appv2-root .section-header { margin: 0.5rem 0 0.25rem; }
-  .template-appv2-root .demo-list { margin: 0.5rem 0 1rem; }
-  .template-appv2-root .button-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-  .template-appv2-root .button-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
-  .template-appv2-root .form-group { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
-</style>
+  {{!-- Local styles kept INSIDE the root so the part has one top-level element --}}
+  <style>
+    .template-appv2-root { padding: 0.5rem 0.75rem; }
+    .template-appv2-root .section-header { margin: 0.5rem 0 0.25rem; }
+    .template-appv2-root .demo-list { margin: 0.5rem 0 1rem; }
+    .template-appv2-root .button-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+    .template-appv2-root .button-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+    .template-appv2-root .form-group { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+  </style>
+
+</section>
