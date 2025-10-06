@@ -15,7 +15,7 @@
   </nav>
 
   {{!-- OVERVIEW TAB --}}
-  <div class="tab" data-group="primary" data-tab="overview">
+<div class="tab {{#if (eq tab "overview")}}active{{/if}}" data-group="primary" data-tab="overview">
     <header class="section-header">
       <h2><i class="fa-solid fa-cubes"></i> AppV2 Template — Overview</h2>
     </header>
@@ -40,7 +40,7 @@
   </div>
 
   {{!-- ACTIONS TAB --}}
-  <div class="tab" data-group="primary" data-tab="actions" style="display:none;">
+<div class="tab {{#if (eq tab "actions")}}active{{/if}}" data-group="primary" data-tab="actions">
     <header class="section-header">
       <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Actions</h2>
     </header>
@@ -60,7 +60,7 @@
   </div>
 
   {{!-- FORM TAB --}}
-  <div class="tab" data-group="primary" data-tab="form" style="display:none;">
+<div class="tab {{#if (eq tab "form")}}active{{/if}}" data-group="primary" data-tab="form">
     <header class="section-header">
       <h2><i class="fa-solid fa-pen-to-square"></i> Form</h2>
     </header>
@@ -89,7 +89,7 @@
   </div>
 
   {{!-- ENRICHMENT TAB --}}
-  <div class="tab" data-group="primary" data-tab="enrichment" style="display:none;">
+<div class="tab {{#if (eq tab "enrichment")}}active{{/if}}" data-group="primary" data-tab="enrichment">
     <header class="section-header">
       <h2><i class="fa-solid fa-book-open"></i> Text Enrichment</h2>
     </header>
