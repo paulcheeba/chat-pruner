@@ -60,14 +60,16 @@ export class TemplateAppV2 extends HandlebarsApplicationMixin(ApplicationV2) {
    * - contentSelector selects the tab panes to show/hide.
    * - initial picks the first tab to open.
    */
-  static TABS = {
-    primary: {
+  // Bind TabsV2 to the nav container, not the individual .item elements.
+  // Use array form with an explicit id so changeTab('...', 'primary') works.
+  static TABS = [
+    {
       id: "primary",
-      navSelector: '.tabs[data-group="primary"] .item',
+      navSelector: '.tabs[data-group="primary"]',
       contentSelector: '.tab[data-group="primary"]',
       initial: "overview"
     }
-  };
+  ];
 
   /**
    * Optionally expose a default tab selection by overriding tabGroups.
