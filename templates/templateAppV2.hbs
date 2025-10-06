@@ -1,0 +1,125 @@
+{{!-- /templates/templateAppV2.hbs --}}
+{{!--
+  A single Handlebars template for our AppV2 PARTS.body.
+  Shows:
+    - Tabs (Overview, Actions, Form, Enrichment)
+    - An #each list
+    - Buttons with data-action
+    - A demo form with submit wired to actions map
+--}}
+
+<section class="template-appv2-root">
+
+  {{!-- Tabs navigation (group "primary") --}}
+  <nav class="tabs" data-group="primary">
+    <a class="item {{#if (eq tab "overview")}}active{{/if}}" data-group="primary" data-tab="overview">Overview</a>
+    <a class="item {{#if (eq tab "actions")}}active{{/if}}" data-group="primary" data-tab="actions">Actions</a>
+    <a class="item {{#if (eq tab "form")}}active{{/if}}" data-group="primary" data-tab="form">Form</a>
+    <a class="item {{#if (eq tab "enrichment")}}active{{/if}}" data-group="primary" data-tab="enrichment">Enrichment</a>
+  </nav>
+
+  {{!-- OVERVIEW TAB --}}
+  <div class="tab" data-group="primary" data-tab="overview">
+    <header class="section-header">
+      <h2><i class="fa-solid fa-cubes"></i> AppV2 Template — Overview</h2>
+    </header>
+
+    <p>
+      Hello, {{user}}. You’re running Foundry {{version}}.
+      This app demonstrates <em>ApplicationV2</em> + <em>HandlebarsApplication</em> with real tabs and actions.
+    </p>
+
+    <h3>Mini list (#each)</h3>
+    <ul class="demo-list">
+      {{#each list as |row|}}
+        <li data-id="{{row.id}}">{{row.label}}</li>
+      {{/each}}
+    </ul>
+
+    <div class="button-row">
+      <button type="button" class="button" data-action="swapTab" data-target="actions">
+        Jump to Actions tab
+      </button>
+    </div>
+  </div>
+
+  {{!-- ACTIONS TAB --}}
+  <div class="tab" data-group="primary" data-tab="actions" style="display:none;">
+    <header class="section-header">
+      <h2><i class="fa-solid fa-wand-magic-sparkles"></i> Actions</h2>
+    </header>
+
+    <p>These buttons use <code>data-action</code> and the AppV2 actions map.</p>
+    <div class="button-grid">
+      <button type="button" class="button" data-action="rollDice">
+        Roll 1d20+5
+      </button>
+      <button type="button" class="button" data-action="notify">
+        Notify
+      </button>
+      <button type="button" class="button" data-action="swapTab" data-target="form">
+        Go to Form
+      </button>
+    </div>
+  </div>
+
+  {{!-- FORM TAB --}}
+  <div class="tab" data-group="primary" data-tab="form" style="display:none;">
+    <header class="section-header">
+      <h2><i class="fa-solid fa-pen-to-square"></i> Form</h2>
+    </header>
+
+    {{!-- A top-level form allows .form and .submit() on the AppV2 --}}
+    <form autocomplete="off">
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input name="name" type="text" placeholder="Type something…">
+      </div>
+
+      <div class="form-group">
+        <label for="color">Favorite Color</label>
+        <input name="color" type="color" value="#3366ee">
+      </div>
+
+      <div class="button-row">
+        <button type="submit" class="button" data-action="submitExample">
+          Submit (handled by actions)
+        </button>
+        <button type="button" class="button" data-action="swapTab" data-target="enrichment">
+          Next: Enrichment
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {{!-- ENRICHMENT TAB --}}
+  <div class="tab" data-group="primary" data-tab="enrichment" style="display:none;">
+    <header class="section-header">
+      <h2><i class="fa-solid fa-book-open"></i> Text Enrichment</h2>
+    </header>
+
+    <p>
+      Below is enriched HTML from <code>TextEditor.enrichHTML</code>, including bold/italic,
+      an inline roll, and a compendium reference:
+    </p>
+
+    <div class="enriched-text">
+      {{{enrichedText}}}
+    </div>
+
+    <div class="button-row">
+      <button type="button" class="button" data-action="swapTab" data-target="overview">
+        Back to Overview
+      </button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .template-appv2-root { padding: 0.5rem 0.75rem; }
+  .template-appv2-root .section-header { margin: 0.5rem 0 0.25rem; }
+  .template-appv2-root .demo-list { margin: 0.5rem 0 1rem; }
+  .template-appv2-root .button-row { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+  .template-appv2-root .button-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.5rem; }
+  .template-appv2-root .form-group { display: grid; grid-template-columns: 160px 1fr; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem; }
+</style>
