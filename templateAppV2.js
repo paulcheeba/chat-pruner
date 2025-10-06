@@ -107,7 +107,7 @@ export class TemplateAppV2 extends HandlebarsApplicationMixin(ApplicationV2) {
       version: game?.version ?? "v13",
       user: game?.user?.name ?? "User",
       list,
-      enrichedText: await TextEditor.enrichHTML(
+  enrichedText: await foundry.applications.ux.TextEditor.implementation.enrichHTML(
         "This is **bold**, _italic_, a roll: [[/roll 1d20+5]], and a @UUID[Compendium.pf2e.actionspf2e.Jump]{compendium link}.",
         { async: true }
       )
