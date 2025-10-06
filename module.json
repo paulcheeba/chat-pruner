@@ -2,27 +2,31 @@
   "id": "fvtt-chat-pruner",
   "name": "fvtt-chat-pruner",
   "title": "Chat Pruner",
-  "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (Application v1).",
-  "version": "1.3.2",
+  "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message.",
+  "version": "13.1.3.10",
   "compatibility": {
-    "minimum": "11",
-    "verified": "13"
+    "minimum": "12",
+    "verified": "13",
+    "maximum": "13.999"
   },
   "authors": [
     {
-      "name": "Paul Cheeba"
+      "name": "Paulcheeba/crusherDestroyer666"
     }
   ],
   "esmodules": [
     "module.js",
-    "module-v2.js"
+    "module-v2.js",
+    "templateAppV2.js",
+    
   ],
   "styles": [
     "styles.css"
   ],
   "templates": [
     "templates/chat-pruner.hbs",
-    "templates/chat-pruner-v2.hbs"
+    "templates/chat-pruner-v2.hbs",
+    "templates/templateAppV2.hbs"
   ],
   "license": "MIT",
   "url": "https://github.com/paulcheeba/chat-pruner",
