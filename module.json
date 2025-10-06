@@ -21,7 +21,8 @@
     "styles.css"
   ],
   "templates": [
-    "templates/chat-pruner.hbs"
+    "templates/chat-pruner.hbs",
+    "templates/chat-pruner-v2.hbs"
   ],
   "license": "MIT",
   "url": "https://github.com/paulcheeba/chat-pruner",
