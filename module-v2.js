@@ -1,11 +1,16 @@
 // Chat Pruner — Application V2 (additive, keeps v1 intact)
 const MOD = "fvtt-chat-pruner";
 
-/**
- * Minimal V2 shell: opens a window and lists the last 200 messages (read-only for now).
- * We’ll keep behavior lean until you approve further features.
- */
-class ChatPrunerAppV2 extends ApplicationV2 {
+// Only define V2 class if ApplicationV2 is available
+let ChatPrunerAppV2;
+
+if (typeof ApplicationV2 !== "undefined") {
+  /**
+   * Minimal V2 shell: opens a window and lists the last 200 messages (read-only for now).
+   * We'll keep behavior lean until you approve further features.
+   * Only available if ApplicationV2 exists.
+   */
+  ChatPrunerAppV2 = class extends ApplicationV2 {
   static DEFAULT_OPTIONS = {
     id: "fvtt-chat-pruner-v2",
     window: {
@@ -72,6 +77,15 @@ class ChatPrunerAppV2 extends ApplicationV2 {
   /** Convenience static to open V2 */
   static open() {
     try {
+      // Check if ApplicationV2 is available
+      if (typeof ApplicationV2 === "undefined") {
+        ui?.notifications?.warn?.(
+          "Chat Pruner V2 requires a newer version of Foundry VTT with ApplicationV2 support."
+        );
+        console.warn(`${MOD} | ApplicationV2 not available. Cannot open V2 interface.`);
+        return;
+      }
+
       // TODO: Verify game.user API for v13 - defensive null checks
       if (!game?.user?.isGM) {
         const message =
@@ -97,6 +111,18 @@ class ChatPrunerAppV2 extends ApplicationV2 {
       );
     }
   }
+  };
+} else {
+  // ApplicationV2 not available - create a no-op class
+  ChatPrunerAppV2 = class {
+    static open() {
+      ui?.notifications?.warn?.(
+        "Chat Pruner V2 requires Foundry VTT v12+ with ApplicationV2 support."
+      );
+      console.warn(`${MOD} | ApplicationV2 not available. V2 features disabled.`);
+    }
+  };
+  console.log(`${MOD} | ApplicationV2 not available. V2 features disabled.`);
 }
 
 // Expose as an additive API without touching the v1 init/ready blocks
@@ -115,8 +141,12 @@ Hooks.once("ready", () => {
     // Add new entry point alongside existing v1 `api.open`
     mod.api.openV2 = () => ChatPrunerAppV2.open();
 
+    const statusMsg = typeof ApplicationV2 !== "undefined" 
+      ? "V2 ready with ApplicationV2 support" 
+      : "V2 ready (fallback mode - ApplicationV2 not available)";
+    
     console.log(
-      `${MOD} | V2 ready. Access via: game.modules.get('${MOD}')?.api?.openV2()`
+      `${MOD} | ${statusMsg}. Access via: game.modules.get('${MOD}')?.api?.openV2()`
     );
   } catch (error) {
     console.error(`${MOD} | Error in V2 ready hook:`, error);
