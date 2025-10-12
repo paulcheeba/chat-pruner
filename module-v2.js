@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.6
+ * Version: 13.1.4.7
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with graceful fallback
  */
@@ -40,14 +40,14 @@ if (ApplicationV2Class) {
       position: { width: 640, height: 480, top: null, left: null },
     };
 
-    /** 
+    /**
      * ApplicationV2 requires PARTS configuration for template rendering
      * This replaces the old V1 template property
      */
     static PARTS = {
       main: {
-        template: `modules/${MOD}/templates/chat-pruner-v2.hbs`
-      }
+        template: `modules/${MOD}/templates/chat-pruner-v2.hbs`,
+      },
     };
 
     /** V2 lifecycle — provide data to the template */
@@ -74,7 +74,7 @@ if (ApplicationV2Class) {
         all.sort((a, b) => a.timestamp - b.timestamp);
         const last = all.slice(-LIMIT);
 
-        // Shape a simple read-only view (no delete; we'll add actions only after approval)
+        // Shape a data structure matching V1's template requirements for consistent UI
         const rows = last.map((m) => ({
           id: m.id,
           ts: m.timestamp,
@@ -84,6 +84,8 @@ if (ApplicationV2Class) {
           preview: (m.flavor || m.content || "")
             .replace(/<[^>]+>/g, "")
             .slice(0, 140),
+          full: (m.flavor || m.content || "").replace(/<[^>]+>/g, ""), // Full text for tooltip
+          canDelete: false, // V2 is read-only for now, V1 has full permissions logic
         }));
 
         const result = {

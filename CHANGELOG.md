@@ -2,24 +2,52 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.4.7] - 2025-10-12
+
+### Enhanced
+- **V2 Template Redesign**: Complete overhaul of chat-pruner-v2.hbs to match V1 functionality
+- V2 interface now includes checkboxes, anchor radios, and action buttons (read-only for now)
+- Enhanced data preparation to provide `full` text for tooltips and `canDelete` permissions
+- Improved V2 UI consistency with established V1 design patterns
+
+### Added
+- V2 preview mode notification with instructions to use V1 for full functionality
+- Enhanced tooltip support showing full message content in V2
+- Disabled action buttons in V2 with clear visual indication of read-only status
+
+### Changed
+- V2 template structure now mirrors V1 layout for consistent user experience
+- Version headers updated across all files
+
+### UI Improvements
+- V2 interface now displays proper column headers (Select, Anchor, Speaker, Time, Preview)
+- Consistent styling using existing CSS classes from V1
+- Clear indication that V2 is in preview/read-only mode
+
+---
+
 ## [13.1.4.6] - 2025-10-12
 
 ### Fixed
+
 - **CRITICAL**: ApplicationV2 empty content issue by implementing proper PARTS configuration
 - Replaced deprecated single `template:` property with `static PARTS` structure
-- Removed unnecessary manual render methods (_renderHTML, _replaceHTML) - HandlebarsApplicationMixin provides these
+- Removed unnecessary manual render methods (\_renderHTML, \_replaceHTML) - HandlebarsApplicationMixin provides these
 
 ### Added
+
 - ApplicationV2 conversion guide reference to Development Reference
 - Enhanced Development Reference with ApplicationV2 implementation patterns
 - Key insights section with proper ApplicationV2 lifecycle methods
 
 ### Changed
-- ApplicationV2 now uses proper template parts system following Foundry V13 patterns  
+
+- ApplicationV2 now uses proper template parts system following Foundry V13 patterns
 - Simplified ApplicationV2 implementation by leveraging HandlebarsApplicationMixin correctly
 - Version headers updated across all files
 
 ### Technical Notes
+
 - **Root Cause**: ApplicationV2 requires `static PARTS = { main: { template: "..." } }` instead of `template:` in DEFAULT_OPTIONS
 - **Reference**: https://foundryvtt.wiki/en/development/guides/applicationV2-conversion-guide
 

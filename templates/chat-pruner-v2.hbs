@@ -1,30 +1,70 @@
 {{!
 Chat Pruner - V2 Template
-Version: 13.1.4.6
-Description: ApplicationV2 interface template (read-only)
+Version: 13.1.4.7
+Description: ApplicationV2 interface template matching V1 functionality (read-only for now)
 }}
-<section class="cpv2-wrap">
-  <header class="cpv2-header">
-    <i class="fa-regular fa-hand-scissors"></i>
-    <h2>Chat Pruner (V2)</h2>
-    <div class="cpv2-count">Showing last {{count}} message(s)</div>
+<section class="pruner-wrap">
+  <header class="pruner-head">
+    <div class="left">
+      <label title="Select/Deselect all" class="checkbox">
+        <input id="pruner-select-all" type="checkbox"> Select All
+      </label>
+    </div>
+    <div class="right">
+      <span>Showing last {{count}} messages (oldest → newest)</span>
+    </div>
   </header>
 
-  <div class="cpv2-table">
-    <div class="cpv2-row cpv2-head">
-      <div class="c-when">When</div>
-      <div class="c-user">User</div>
-      <div class="c-speaker">Speaker</div>
-      <div class="c-preview">Preview</div>
-    </div>
-
-    {{#each rows}}
-      <div class="cpv2-row">
-        <div class="c-when" title="{{this.ts}}">{{this.when}}</div>
-        <div class="c-user">{{this.user}}</div>
-        <div class="c-speaker">{{this.speaker}}</div>
-        <div class="c-preview" title="{{this.preview}}">{{this.preview}}</div>
-      </div>
-    {{/each}}
+  <!-- Column headers / descriptors -->
+  <div class="pruner-cols">
+    <div class="col cb">Select</div>
+    <div class="col anchor">Anchor</div>
+    <div class="col speaker">Speaker</div>
+    <div class="col time">Time</div>
+    <div class="col content">Preview</div>
   </div>
+
+  <ol class="pruner-list">
+    {{#each rows as |row|}}
+    <li class="pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}">
+      <div class="cells">
+        <div class="cell cb">
+          <input class="sel" type="checkbox" value="{{row.id}}" {{#unless row.canDelete}}disabled{{/unless}}>
+        </div>
+        <div class="cell anchor">
+          <input class="anchor" type="radio" name="anchor" value="{{row.id}}">
+        </div>
+        <div class="cell speaker">
+          <div class="who">
+            <strong class="speaker-name">{{row.speaker}}</strong>
+            <span class="user">({{row.user}})</span>
+          </div>
+        </div>
+        <div class="cell time">
+          {{row.when}}
+        </div>
+        <!-- Use native browser tooltip: put the FULL text in title -->
+        <div class="cell content" title="{{row.full}}">
+          {{row.preview}}
+          {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
+        </div>
+      </div>
+    </li>
+    {{/each}}
+  </ol>
+
+  <footer class="pruner-foot">
+    <div class="btns">
+      <button type="button" class="btn primary" data-action="deleteSelected" disabled><i class="fas fa-trash"></i> Delete Selected</button>
+      <button type="button" class="btn" data-action="deleteNewer" disabled><i class="fas fa-forward"></i> Delete newer than anchor</button>
+      <button type="button" class="btn" data-action="deleteOlder" disabled><i class="fas fa-backward"></i> Delete older than anchor</button>
+      <span class="spacer"></span>
+      <button type="button" class="btn ghost" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
+      <button type="button" class="btn ghost" data-action="about"><i class="fas fa-info-circle"></i> About</button>
+    </div>
+    <p class="tip">
+      <strong>V2 Preview Mode:</strong> Checkboxes and action buttons are read-only for now. 
+      Use V1 interface for full functionality: <code>game.modules.get('fvtt-chat-pruner')?.api?.open()</code>
+    </p>
+  </footer>
 </section>
