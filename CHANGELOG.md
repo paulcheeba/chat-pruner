@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.4.4] - 2025-10-12
+
+### Fixed
+- ApplicationV2 render method errors by implementing HandlebarsApplicationMixin integration
+- Added fallback _renderHTML and _replaceHTML methods for cases without HandlebarsApplicationMixin
+- Enhanced ApplicationV2 compatibility with proper render method implementation
+
+### Changed
+- ApplicationV2 now uses HandlebarsApplicationMixin when available for proper render support
+- Improved error handling and diagnostic logging for ApplicationV2 features
+- Version headers updated across all files
+
+---
+
 ## [13.1.4.3] - 2025-10-12
 
 ### Added

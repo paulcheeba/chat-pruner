@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.3
+ * Version: 13.1.4.4
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with graceful fallback
  */
@@ -13,14 +13,20 @@ let ChatPrunerAppV2;
 
 // Check for ApplicationV2 in both global and foundry.applications.api namespaces
 const ApplicationV2Class = globalThis.ApplicationV2 || foundry?.applications?.api?.ApplicationV2;
+const HandlebarsApplicationMixin = foundry?.applications?.api?.HandlebarsApplicationMixin;
 
 if (ApplicationV2Class) {
   /**
    * Minimal V2 shell: opens a window and lists the last 200 messages (read-only for now).
    * We'll keep behavior lean until you approve further features.
    * Only available if ApplicationV2 exists.
+   * Uses HandlebarsApplicationMixin to provide render methods (_renderHTML, _replaceHTML).
    */
-  ChatPrunerAppV2 = class extends ApplicationV2Class {
+  const BaseClass = HandlebarsApplicationMixin ? 
+    HandlebarsApplicationMixin(ApplicationV2Class) : 
+    ApplicationV2Class;
+    
+  ChatPrunerAppV2 = class extends BaseClass {
   static DEFAULT_OPTIONS = {
     id: "fvtt-chat-pruner-v2",
     window: {
@@ -32,6 +38,48 @@ if (ApplicationV2Class) {
     position: { width: 640, height: 480, top: null, left: null },
     template: `modules/${MOD}/templates/chat-pruner-v2.hbs`,
   };
+
+  /** 
+   * Manual render method implementation when HandlebarsApplicationMixin is not available
+   * ApplicationV2 requires either HandlebarsApplicationMixin or manual _renderHTML/_replaceHTML
+   */
+  async _renderHTML(context, options) {
+    if (HandlebarsApplicationMixin) {
+      // HandlebarsApplicationMixin provides this method
+      return super._renderHTML(context, options);
+    }
+    
+    // Manual fallback implementation
+    try {
+      const template = this.options.template;
+      if (!template) {
+        throw new Error("No template specified for ApplicationV2");
+      }
+      
+      // Load and compile template
+      const compiled = await getTemplate(template);
+      return compiled(context);
+    } catch (error) {
+      console.error(`${MOD} | Error in _renderHTML fallback:`, error);
+      return `<div class="error">Template rendering failed: ${error.message}</div>`;
+    }
+  }
+
+  async _replaceHTML(element, html, options) {
+    if (HandlebarsApplicationMixin) {
+      // HandlebarsApplicationMixin provides this method
+      return super._replaceHTML(element, html, options);
+    }
+    
+    // Manual fallback implementation
+    try {
+      element.innerHTML = html;
+      this.activateListeners(element);
+    } catch (error) {
+      console.error(`${MOD} | Error in _replaceHTML fallback:`, error);
+      element.innerHTML = `<div class="error">HTML replacement failed: ${error.message}</div>`;
+    }
+  }
 
   /** V2 lifecycle — provide data to the template */
   async _prepareContext(_options = {}) {
@@ -156,16 +204,18 @@ Hooks.once("ready", () => {
     const foundryVersion = game?.version || "unknown";
     const hasGlobalApplicationV2 = typeof ApplicationV2 !== "undefined";
     const hasFoundryApplicationsApi = typeof foundry?.applications?.api?.ApplicationV2 !== "undefined";
+    const hasHandlebarsApplicationMixin = typeof foundry?.applications?.api?.HandlebarsApplicationMixin !== "undefined";
     const hasApplicationV2 = hasGlobalApplicationV2 || hasFoundryApplicationsApi;
     
     const statusMsg = hasApplicationV2 
-      ? "V2 ready with ApplicationV2 support" 
+      ? `V2 ready with ApplicationV2 support${hasHandlebarsApplicationMixin ? ' (HandlebarsApplicationMixin)' : ' (manual render methods)'}` 
       : "V2 ready (fallback mode - ApplicationV2 not available)";
     
     console.log(`${MOD} | ${statusMsg}`);
     console.log(`${MOD} | Foundry Version: ${foundryVersion}`);
     console.log(`${MOD} | Global ApplicationV2: ${hasGlobalApplicationV2}`);
     console.log(`${MOD} | foundry.applications.api.ApplicationV2: ${hasFoundryApplicationsApi}`);
+    console.log(`${MOD} | foundry.applications.api.HandlebarsApplicationMixin: ${hasHandlebarsApplicationMixin}`);
     console.log(`${MOD} | ApplicationV2 Available (either): ${hasApplicationV2}`);
     console.log(`${MOD} | Access via: game.modules.get('${MOD}')?.api?.openV2()`);
     
