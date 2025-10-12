@@ -141,13 +141,21 @@ Hooks.once("ready", () => {
     // Add new entry point alongside existing v1 `api.open`
     mod.api.openV2 = () => ChatPrunerAppV2.open();
 
-    const statusMsg = typeof ApplicationV2 !== "undefined" 
+    // Enhanced status reporting
+    const foundryVersion = game?.version || "unknown";
+    const hasApplicationV2 = typeof ApplicationV2 !== "undefined";
+    const hasFoundryApplicationsApi = typeof foundry?.applications?.api?.ApplicationV2 !== "undefined";
+    
+    const statusMsg = hasApplicationV2 
       ? "V2 ready with ApplicationV2 support" 
       : "V2 ready (fallback mode - ApplicationV2 not available)";
     
-    console.log(
-      `${MOD} | ${statusMsg}. Access via: game.modules.get('${MOD}')?.api?.openV2()`
-    );
+    console.log(`${MOD} | ${statusMsg}`);
+    console.log(`${MOD} | Foundry Version: ${foundryVersion}`);
+    console.log(`${MOD} | ApplicationV2 Available: ${hasApplicationV2}`);
+    console.log(`${MOD} | foundry.applications.api.ApplicationV2 Available: ${hasFoundryApplicationsApi}`);
+    console.log(`${MOD} | Access via: game.modules.get('${MOD}')?.api?.openV2()`);
+    
   } catch (error) {
     console.error(`${MOD} | Error in V2 ready hook:`, error);
   }
