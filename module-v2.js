@@ -4,13 +4,16 @@ const MOD = "fvtt-chat-pruner";
 // Only define V2 class if ApplicationV2 is available
 let ChatPrunerAppV2;
 
-if (typeof ApplicationV2 !== "undefined") {
+// Check for ApplicationV2 in both global and foundry.applications.api namespaces
+const ApplicationV2Class = globalThis.ApplicationV2 || foundry?.applications?.api?.ApplicationV2;
+
+if (ApplicationV2Class) {
   /**
    * Minimal V2 shell: opens a window and lists the last 200 messages (read-only for now).
    * We'll keep behavior lean until you approve further features.
    * Only available if ApplicationV2 exists.
    */
-  ChatPrunerAppV2 = class extends ApplicationV2 {
+  ChatPrunerAppV2 = class extends ApplicationV2Class {
   static DEFAULT_OPTIONS = {
     id: "fvtt-chat-pruner-v2",
     window: {
@@ -77,10 +80,11 @@ if (typeof ApplicationV2 !== "undefined") {
   /** Convenience static to open V2 */
   static open() {
     try {
-      // Check if ApplicationV2 is available
-      if (typeof ApplicationV2 === "undefined") {
+      // Check if ApplicationV2 is available in any namespace
+      const ApplicationV2Class = globalThis.ApplicationV2 || foundry?.applications?.api?.ApplicationV2;
+      if (!ApplicationV2Class) {
         ui?.notifications?.warn?.(
-          "Chat Pruner V2 requires a newer version of Foundry VTT with ApplicationV2 support."
+          "Chat Pruner V2 requires Foundry VTT v12+ with ApplicationV2 support."
         );
         console.warn(`${MOD} | ApplicationV2 not available. Cannot open V2 interface.`);
         return;
@@ -122,7 +126,7 @@ if (typeof ApplicationV2 !== "undefined") {
       console.warn(`${MOD} | ApplicationV2 not available. V2 features disabled.`);
     }
   };
-  console.log(`${MOD} | ApplicationV2 not available. V2 features disabled.`);
+  console.log(`${MOD} | ApplicationV2 not available in any namespace. V2 features disabled.`);
 }
 
 // Expose as an additive API without touching the v1 init/ready blocks
@@ -143,8 +147,9 @@ Hooks.once("ready", () => {
 
     // Enhanced status reporting
     const foundryVersion = game?.version || "unknown";
-    const hasApplicationV2 = typeof ApplicationV2 !== "undefined";
+    const hasGlobalApplicationV2 = typeof ApplicationV2 !== "undefined";
     const hasFoundryApplicationsApi = typeof foundry?.applications?.api?.ApplicationV2 !== "undefined";
+    const hasApplicationV2 = hasGlobalApplicationV2 || hasFoundryApplicationsApi;
     
     const statusMsg = hasApplicationV2 
       ? "V2 ready with ApplicationV2 support" 
@@ -152,8 +157,9 @@ Hooks.once("ready", () => {
     
     console.log(`${MOD} | ${statusMsg}`);
     console.log(`${MOD} | Foundry Version: ${foundryVersion}`);
-    console.log(`${MOD} | ApplicationV2 Available: ${hasApplicationV2}`);
-    console.log(`${MOD} | foundry.applications.api.ApplicationV2 Available: ${hasFoundryApplicationsApi}`);
+    console.log(`${MOD} | Global ApplicationV2: ${hasGlobalApplicationV2}`);
+    console.log(`${MOD} | foundry.applications.api.ApplicationV2: ${hasFoundryApplicationsApi}`);
+    console.log(`${MOD} | ApplicationV2 Available (either): ${hasApplicationV2}`);
     console.log(`${MOD} | Access via: game.modules.get('${MOD}')?.api?.openV2()`);
     
   } catch (error) {
