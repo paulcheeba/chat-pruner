@@ -1,3 +1,10 @@
+/**
+ * Chat Pruner - ApplicationV2 Module (Future Compatibility)
+ * Version: 13.1.4.3
+ * Compatible: Foundry VTT v12+ (ApplicationV2 required)
+ * Description: Modern ApplicationV2 implementation with graceful fallback
+ */
+
 // Chat Pruner — Application V2 (additive, keeps v1 intact)
 const MOD = "fvtt-chat-pruner";
 
