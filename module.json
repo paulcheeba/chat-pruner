@@ -13,16 +13,9 @@
       "name": "Paul Cheeba"
     }
   ],
-  "esmodules": [
-    "module.js",
-    "module-v2.js"
-  ],
-  "styles": [
-    "styles.css"
-  ],
-  "templates": [
-    "templates/chat-pruner.hbs"
-  ],
+  "esmodules": ["module.js", "module-v2.js"],
+  "styles": ["styles.css"],
+  "templates": ["templates/chat-pruner.hbs", "templates/chat-pruner-v2.hbs"],
   "license": "MIT",
   "url": "https://github.com/paulcheeba/chat-pruner",
   "manifest": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json",

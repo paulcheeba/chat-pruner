@@ -1,0 +1,16 @@
+{
+  "editor.inlineSuggest.enabled": true,
+  "editor.suggest.showWords": true,
+  "editor.suggest.preview": true,
+  "github.copilot.inlineSuggest.enable": true,
+  "github.copilot.editor.enableAutoCompletions": true,
+  "github.copilot.chat.locale": "en",
+  "github.copilot.chat.showWelcome": false,
+
+  // Formatting & linting (optional but helpful)
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+  "files.trimTrailingWhitespace": true,
+  "files.insertFinalNewline": true
+}

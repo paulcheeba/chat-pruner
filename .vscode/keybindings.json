@@ -1,0 +1,16 @@
+[
+  {
+    "key": "ctrl+i",
+    "command": "github.copilot.generate",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+i",
+    "command": "github.copilot.chat.togglePanel"
+  },
+  {
+    "key": "ctrl+shift+.",
+    "command": "github.copilot.inlineSuggest.trigger",
+    "when": "editorTextFocus && !editorReadonly"
+  }
+]

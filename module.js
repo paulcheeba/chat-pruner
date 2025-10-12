@@ -24,16 +24,20 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: game.user?.isGM === true,
     // v13.350+ uses onChange; run regardless of 'active' per official example
-    onChange: () => { _openOnce(); },    // Older cores may still call onClick; keep as fallback without double-triggering
+    onChange: () => {
+      _openOnce();
+    }, // Older cores may still call onClick; keep as fallback without double-triggering
     onClick: _openOnce,
     // Place at bottom of the tool list to avoid reordering issues
-    order: Array.isArray(notes.tools) ? notes.tools.length : Object.keys(notes.tools ?? {}).length
+    order: Array.isArray(notes.tools)
+      ? notes.tools.length
+      : Object.keys(notes.tools ?? {}).length,
   };
 
   // v13: tools is a record; pre-v13: array. Handle both additively.
   if (Array.isArray(notes.tools)) {
     // Pre-v13 compatibility (array)
-    const exists = notes.tools.some(t => t.name === tool.name);
+    const exists = notes.tools.some((t) => t.name === tool.name);
     if (!exists) notes.tools.push(tool);
   } else {
     // v13 (record/object)
@@ -47,7 +51,9 @@ function stripHTMLSafe(input) {
   const html = String(input ?? "");
   const div = document.createElement("div");
   div.innerHTML = html;
-  const text = (div.textContent || div.innerText || "").replace(/\s+/g, " ").trim();
+  const text = (div.textContent || div.innerText || "")
+    .replace(/\s+/g, " ")
+    .trim();
   return text;
 }
 
@@ -55,9 +61,12 @@ function stripHTMLSafe(input) {
 function canDeleteMessage(msg, user) {
   try {
     if (user?.isGM) return true;
-    if (typeof msg?.canUserModify === "function") return msg.canUserModify(user, "delete");
+    if (typeof msg?.canUserModify === "function")
+      return msg.canUserModify(user, "delete");
     if ("isOwner" in msg) return !!msg.isOwner;
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    /* ignore */
+  }
   return false;
 }
 
@@ -81,7 +90,10 @@ async function deleteMessagesByIds(ids) {
 }
 
 Hooks.once("init", async () => {
-  await loadTemplates([`modules/${MOD}/templates/chat-pruner.hbs`]);
+  await loadTemplates([
+    `modules/${MOD}/templates/chat-pruner.hbs`,
+    `modules/${MOD}/templates/chat-pruner-v2.hbs`, // V2 additive template
+  ]);
 });
 
 Hooks.once("ready", () => {
@@ -89,7 +101,9 @@ Hooks.once("ready", () => {
   if (mod) {
     mod.api = { open: () => ChatPrunerApp.open() };
   }
-  console.log(`${MOD} | Ready. Create a Macro with: game.modules.get('${MOD}')?.api?.open()`);
+  console.log(
+    `${MOD} | Ready. Create a Macro with: game.modules.get('${MOD}')?.api?.open()`
+  );
 });
 
 class ChatPrunerApp extends Application {
@@ -98,7 +112,9 @@ class ChatPrunerApp extends Application {
       ui.notifications?.warn?.("Chat Pruner is GM-only.");
       return;
     }
-    const existing = Object.values(ui.windows).find((w) => w instanceof ChatPrunerApp);
+    const existing = Object.values(ui.windows).find(
+      (w) => w instanceof ChatPrunerApp
+    );
     if (existing) return existing.bringToTop();
     new ChatPrunerApp().render(true);
   }
@@ -123,7 +139,9 @@ class ChatPrunerApp extends Application {
   _getLastMessages(limit) {
     const all = game.messages?.contents ?? [];
     // oldest → newest for anchor logic
-    const slice = all.slice(-limit).sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
+    const slice = all
+      .slice(-limit)
+      .sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
     return slice.map((m) => {
       const ts = m?.timestamp ?? m?._source?.timestamp ?? 0;
       const when = ts ? new Date(ts).toLocaleString() : "";
@@ -140,7 +158,7 @@ class ChatPrunerApp extends Application {
         user,
         speaker,
         content: previewText, // for on-screen preview
-        full: fullText,       // for native browser tooltip
+        full: fullText, // for native browser tooltip
         canDelete: canDeleteMessage(m, game.user),
       };
     });
@@ -162,7 +180,10 @@ class ChatPrunerApp extends Application {
     // Select all
     html.find("#pruner-select-all").on("change", (ev) => {
       const checked = ev.currentTarget.checked;
-      html.find("input.sel[type=checkbox]:enabled").prop("checked", checked).trigger("change");
+      html
+        .find("input.sel[type=checkbox]:enabled")
+        .prop("checked", checked)
+        .trigger("change");
     });
 
     // Visual highlight when a row is selected
@@ -172,15 +193,24 @@ class ChatPrunerApp extends Application {
     });
 
     // Buttons
-    html.find("[data-action=deleteSelected]").on("click", () => this._deleteSelected(html));
-    html.find("[data-action=deleteNewer]").on("click", () => this._deleteNewerThanAnchor(html));
-    html.find("[data-action=deleteOlder]").on("click", () => this._deleteOlderThanAnchor(html));
+    html
+      .find("[data-action=deleteSelected]")
+      .on("click", () => this._deleteSelected(html));
+    html
+      .find("[data-action=deleteNewer]")
+      .on("click", () => this._deleteNewerThanAnchor(html));
+    html
+      .find("[data-action=deleteOlder]")
+      .on("click", () => this._deleteOlderThanAnchor(html));
     html.find("[data-action=refresh]").on("click", () => this.render(true));
     html.find("[data-action=about]").on("click", () => this._about());
   }
 
   async _deleteSelected(html) {
-    const ids = html.find("input.sel[type=checkbox]:checked").map((_, el) => el.value).get();
+    const ids = html
+      .find("input.sel[type=checkbox]:checked")
+      .map((_, el) => el.value)
+      .get();
     if (!ids.length) return ui.notifications?.warn?.("No messages selected.");
 
     const ok = await Dialog.confirm({
@@ -194,21 +224,30 @@ class ChatPrunerApp extends Application {
 
   async _deleteNewerThanAnchor(html) {
     const anchorId = html.find("input.anchor[type=radio]:checked").val();
-    if (!anchorId) return ui.notifications?.warn?.("Choose an anchor message first.");
+    if (!anchorId)
+      return ui.notifications?.warn?.("Choose an anchor message first.");
 
     const rows = this._getLastMessages(200); // oldest → newest
     const idx = rows.findIndex((r) => r.id === anchorId);
-    if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
+    if (idx === -1)
+      return ui.notifications?.error?.("Anchor message not found.");
 
     const newer = rows.slice(idx + 1);
     const ids = newer.filter((r) => r.canDelete).map((r) => r.id);
     const blocked = newer.filter((r) => !r.canDelete).length;
 
-    if (!ids.length) return ui.notifications?.info?.("No deletable messages newer than the selected anchor.");
+    if (!ids.length)
+      return ui.notifications?.info?.(
+        "No deletable messages newer than the selected anchor."
+      );
 
     const ok = await Dialog.confirm({
       title: "Delete Newer Than Anchor",
-      content: `<p>Delete ${ids.length} newer message(s) than the selected anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`,
+      content: `<p>Delete ${
+        ids.length
+      } newer message(s) than the selected anchor? ${
+        blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+      }</p>`,
     });
     if (!ok) return;
 
@@ -217,21 +256,30 @@ class ChatPrunerApp extends Application {
 
   async _deleteOlderThanAnchor(html) {
     const anchorId = html.find("input.anchor[type=radio]:checked").val();
-    if (!anchorId) return ui.notifications?.warn?.("Choose an anchor message first.");
+    if (!anchorId)
+      return ui.notifications?.warn?.("Choose an anchor message first.");
 
     const rows = this._getLastMessages(200); // oldest → newest
     const idx = rows.findIndex((r) => r.id === anchorId);
-    if (idx === -1) return ui.notifications?.error?.("Anchor message not found.");
+    if (idx === -1)
+      return ui.notifications?.error?.("Anchor message not found.");
 
     const older = rows.slice(0, idx);
     const ids = older.filter((r) => r.canDelete).map((r) => r.id);
     const blocked = older.filter((r) => !r.canDelete).length;
 
-    if (!ids.length) return ui.notifications?.info?.("No deletable messages older than the selected anchor.");
+    if (!ids.length)
+      return ui.notifications?.info?.(
+        "No deletable messages older than the selected anchor."
+      );
 
     const ok = await Dialog.confirm({
       title: "Delete Older Than Anchor",
-      content: `<p>Delete ${ids.length} older message(s) than the selected anchor? ${blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""}</p>`,
+      content: `<p>Delete ${
+        ids.length
+      } older message(s) than the selected anchor? ${
+        blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+      }</p>`,
     });
     if (!ok) return;
 
@@ -244,7 +292,10 @@ class ChatPrunerApp extends Application {
       return m && canDeleteMessage(m, game.user);
     });
 
-    if (!deletable.length) return ui.notifications?.error?.("You don't have permission to delete the selected messages.");
+    if (!deletable.length)
+      return ui.notifications?.error?.(
+        "You don't have permission to delete the selected messages."
+      );
 
     try {
       await deleteMessagesByIds(deletable);
@@ -252,7 +303,9 @@ class ChatPrunerApp extends Application {
       this.render(true);
     } catch (err) {
       console.error(`${MOD} | delete failed`, err);
-      ui.notifications?.error?.("Some messages could not be deleted. See console for details.");
+      ui.notifications?.error?.(
+        "Some messages could not be deleted. See console for details."
+      );
     }
   }
 
