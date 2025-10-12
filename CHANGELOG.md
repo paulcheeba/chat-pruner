@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.4.6] - 2025-10-12
+
+### Fixed
+- **CRITICAL**: ApplicationV2 empty content issue by implementing proper PARTS configuration
+- Replaced deprecated single `template:` property with `static PARTS` structure
+- Removed unnecessary manual render methods (_renderHTML, _replaceHTML) - HandlebarsApplicationMixin provides these
+
+### Added
+- ApplicationV2 conversion guide reference to Development Reference
+- Enhanced Development Reference with ApplicationV2 implementation patterns
+- Key insights section with proper ApplicationV2 lifecycle methods
+
+### Changed
+- ApplicationV2 now uses proper template parts system following Foundry V13 patterns  
+- Simplified ApplicationV2 implementation by leveraging HandlebarsApplicationMixin correctly
+- Version headers updated across all files
+
+### Technical Notes
+- **Root Cause**: ApplicationV2 requires `static PARTS = { main: { template: "..." } }` instead of `template:` in DEFAULT_OPTIONS
+- **Reference**: https://foundryvtt.wiki/en/development/guides/applicationV2-conversion-guide
+
+---
+
 ## [13.1.4.5] - 2025-10-12
 
 ### Fixed

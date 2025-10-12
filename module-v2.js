@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.5
+ * Version: 13.1.4.6
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with graceful fallback
  */
@@ -38,50 +38,17 @@ if (ApplicationV2Class) {
       tag: "section",
       classes: ["fvtt-chat-pruner", "fvtt-chat-pruner-v2"],
       position: { width: 640, height: 480, top: null, left: null },
-      template: `modules/${MOD}/templates/chat-pruner-v2.hbs`,
     };
 
-    /**
-     * Manual render method implementation when HandlebarsApplicationMixin is not available
-     * ApplicationV2 requires either HandlebarsApplicationMixin or manual _renderHTML/_replaceHTML
+    /** 
+     * ApplicationV2 requires PARTS configuration for template rendering
+     * This replaces the old V1 template property
      */
-    async _renderHTML(context, options) {
-      if (HandlebarsApplicationMixin) {
-        // HandlebarsApplicationMixin provides this method
-        return super._renderHTML(context, options);
+    static PARTS = {
+      main: {
+        template: `modules/${MOD}/templates/chat-pruner-v2.hbs`
       }
-
-      // Manual fallback implementation
-      try {
-        const template = this.options.template;
-        if (!template) {
-          throw new Error("No template specified for ApplicationV2");
-        }
-
-        // Load and compile template
-        const compiled = await getTemplate(template);
-        return compiled(context);
-      } catch (error) {
-        console.error(`${MOD} | Error in _renderHTML fallback:`, error);
-        return `<div class="error">Template rendering failed: ${error.message}</div>`;
-      }
-    }
-
-    async _replaceHTML(element, html, options) {
-      if (HandlebarsApplicationMixin) {
-        // HandlebarsApplicationMixin provides this method
-        return super._replaceHTML(element, html, options);
-      }
-
-      // Manual fallback implementation
-      try {
-        element.innerHTML = html;
-        this.activateListeners(element);
-      } catch (error) {
-        console.error(`${MOD} | Error in _replaceHTML fallback:`, error);
-        element.innerHTML = `<div class="error">HTML replacement failed: ${error.message}</div>`;
-      }
-    }
+    };
 
     /** V2 lifecycle — provide data to the template */
     async _prepareContext(_options = {}) {

@@ -1,13 +1,26 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.4.3**
+**Version: 13.1.4.6**
 
 ## 🏗️ Project Overview
 **Module ID**: `fvtt-chat-pruner`  
 **Repository**: `paulcheeba/chat-pruner`  
 **Compatibility**: Foundry VTT v11-v13  
 **Current Stable**: v1.3.2  
-**Current Development**: v13.1.4.3  
+**Current Development**: v13.1.4.6  
+
+## 📚 Essential References
+
+### 🔗 **ApplicationV2 Conversion Guide**
+**URL**: https://foundryvtt.wiki/en/development/guides/applicationV2-conversion-guide
+**Critical for**: Understanding ApplicationV2 template parts, lifecycle methods, and HandlebarsApplicationMixin usage
+
+### 🎯 **Key ApplicationV2 Insights**
+- **Template Parts**: ApplicationV2 uses `PARTS` configuration instead of single template
+- **Lifecycle Methods**: `getData()` becomes `_prepareContext()`
+- **HandlebarsApplicationMixin**: Required for template rendering (`_renderHTML`, `_replaceHTML`)
+- **Constructor Pattern**: All parameters go in single options object
+- **Event System**: `activateListeners()` becomes `actions` configuration
 
 ## 📋 Paul's Development Rules & Workflow
 
@@ -62,7 +75,35 @@ chat-pruner/
 ### ApplicationV2 Availability
 - **Global**: `ApplicationV2` (not available in v13.350)
 - **Namespace**: `foundry.applications.api.ApplicationV2` ✅ (available in v13.350)
+- **HandlebarsApplicationMixin**: `foundry.applications.api.HandlebarsApplicationMixin` ✅
 - **Detection**: Check both namespaces for compatibility
+
+### ApplicationV2 Implementation Patterns
+```javascript
+// Correct V2 Pattern
+const { ApplicationV2, HandlebarsApplicationMixin } = foundry.applications.api;
+
+class MyApp extends HandlebarsApplicationMixin(ApplicationV2) {
+  static DEFAULT_OPTIONS = {
+    id: "my-app",
+    classes: ["my-app"],
+    tag: "section", 
+    position: { width: 640, height: 480 }
+  };
+
+  static PARTS = {
+    main: {
+      template: "path/to/template.hbs"
+    }
+  };
+
+  async _prepareContext(options) {
+    const context = await super._prepareContext(options);
+    // Add data here
+    return context;
+  }
+}
+```
 
 ### Key FVTT APIs Used
 ```javascript
@@ -95,6 +136,18 @@ function canDeleteMessage(msg, user) {
 ```
 
 ## 🚨 Known Issues & Solutions
+
+### ApplicationV2 Empty Content Issue  
+**Problem**: ApplicationV2 window opens but shows no content  
+**Root Cause**: Missing `PARTS` configuration - ApplicationV2 requires template parts, not single template  
+**Solution**: Define `PARTS` static property with template configuration
+```javascript
+static PARTS = {
+  main: {
+    template: "modules/fvtt-chat-pruner/templates/chat-pruner-v2.hbs"
+  }
+};
+```
 
 ### ApplicationV2 Not Defined Error
 **Problem**: `ApplicationV2 is not defined` in some Foundry versions  
