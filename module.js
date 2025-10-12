@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - Main Module (Application V1)
- * Version: 13.1.4.4
+ * Version: 13.1.4.5
  * Compatible: Foundry VTT v11-v13
  * Description: GM-only chat pruning tool with multi-select delete and anchor functionality
  */
