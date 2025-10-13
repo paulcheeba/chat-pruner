@@ -1,6 +1,6 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.4.6**
+**Version: 13.1.4.7**
 
 ## 🏗️ Project Overview
 
@@ -8,7 +8,7 @@
 **Repository**: `paulcheeba/chat-pruner`
 **Compatibility**: Foundry VTT v11-v13
 **Current Stable**: v1.3.2
-**Current Development**: v13.1.4.6
+**Current Development**: v13.1.4.7 ⭐ **(NEW BASELINE)**
 
 ## 📚 Essential References
 
@@ -254,6 +254,30 @@ try {
 - Maintain backward compatibility
 
 ## 🔄 Recent Changes Log
+
+### ⭐ v13.1.4.7 - NEW BASELINE: Complete ApplicationV2 Success
+- **MILESTONE**: Successfully implemented fully functional ApplicationV2 interface
+- Complete V2 template overhaul matching V1 functionality and design
+- Resolved all ApplicationV2 rendering issues using proper PARTS configuration
+- Added ApplicationV2 conversion guide reference for future development
+- V2 interface now provides professional, production-ready preview experience
+- **Status**: ApplicationV2 conversion complete - ready for future functionality expansion
+
+### v13.1.4.6 - ApplicationV2 PARTS Configuration Fix
+- **CRITICAL**: Fixed empty content issue with proper static PARTS configuration
+- Replaced deprecated single template property with ApplicationV2 template parts system
+- Added ApplicationV2 conversion guide reference to Development Reference
+- Simplified implementation leveraging HandlebarsApplicationMixin correctly
+
+### v13.1.4.5 - Deprecation Warning and Content Display
+- Fixed ChatMessage deprecation warning (m.user → m.author for v12+ compatibility)
+- Enhanced ApplicationV2 lifecycle method support with _preparePartContext
+- Added comprehensive debug logging for troubleshooting
+
+### v13.1.4.4 - ApplicationV2 Render Method Implementation
+- Fixed ApplicationV2 render method errors with HandlebarsApplicationMixin integration
+- Added fallback _renderHTML and _replaceHTML methods for compatibility
+- Enhanced ApplicationV2 compatibility with proper render method implementation
 
 ### v13.1.4.3 - Version Tracking & Development Workflow
 
