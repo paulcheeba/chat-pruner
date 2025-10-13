@@ -1,8 +1,8 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.7
+ * Version: 13.1.4.8
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
- * Description: Modern ApplicationV2 implementation with graceful fallback
+ * Description: Modern ApplicationV2 implementation with full V1 functionality
  */
 
 // Chat Pruner — Application V2 (additive, keeps v1 intact)
@@ -38,6 +38,15 @@ if (ApplicationV2Class) {
       tag: "section",
       classes: ["fvtt-chat-pruner", "fvtt-chat-pruner-v2"],
       position: { width: 640, height: 480, top: null, left: null },
+      actions: {
+        deleteSelected: ChatPrunerAppV2._deleteSelected,
+        deleteNewer: ChatPrunerAppV2._deleteNewerThanAnchor,
+        deleteOlder: ChatPrunerAppV2._deleteOlderThanAnchor,
+        refresh: ChatPrunerAppV2._refresh,
+        about: ChatPrunerAppV2._about,
+        toggleSelectAll: ChatPrunerAppV2._toggleSelectAll,
+        toggleRowSelection: ChatPrunerAppV2._toggleRowSelection,
+      },
     };
 
     /**
@@ -49,6 +58,21 @@ if (ApplicationV2Class) {
         template: `modules/${MOD}/templates/chat-pruner-v2.hbs`,
       },
     };
+
+    /**
+     * Helper function for permission checking (instance method for use in _prepareContext)
+     */
+    _canDeleteMessage(msg, user) {
+      try {
+        if (user?.isGM) return true;
+        if (typeof msg?.canUserModify === "function")
+          return msg.canUserModify(user, "delete");
+        if ("isOwner" in msg) return !!msg.isOwner;
+      } catch (e) {
+        /* ignore */
+      }
+      return false;
+    }
 
     /** V2 lifecycle — provide data to the template */
     async _prepareContext(_options = {}) {
@@ -74,7 +98,7 @@ if (ApplicationV2Class) {
         all.sort((a, b) => a.timestamp - b.timestamp);
         const last = all.slice(-LIMIT);
 
-        // Shape a data structure matching V1's template requirements for consistent UI
+        // Shape a data structure matching V1's template requirements with proper permissions
         const rows = last.map((m) => ({
           id: m.id,
           ts: m.timestamp,
@@ -85,7 +109,7 @@ if (ApplicationV2Class) {
             .replace(/<[^>]+>/g, "")
             .slice(0, 140),
           full: (m.flavor || m.content || "").replace(/<[^>]+>/g, ""), // Full text for tooltip
-          canDelete: false, // V2 is read-only for now, V1 has full permissions logic
+          canDelete: this._canDeleteMessage(m, game.user), // Real permission check for V2 functionality
         }));
 
         const result = {
@@ -119,10 +143,260 @@ if (ApplicationV2Class) {
       return this._prepareContext(_options);
     }
 
-    /** Optional: local listeners (none yet; keep minimal) */
-    activateListeners(html) {
-      super.activateListeners(html);
-      // Future additive actions go here (e.g., open v1 from v2, dry-run, filters). Keeping empty per your request.
+    // ========================================
+    // V2 Action Handlers (Static Methods)
+    // ========================================
+
+    /**
+     * Helper function to get current messages data (mirroring V1's _getLastMessages)
+     */
+    _getLastMessages(limit = 200) {
+      const collection = game.messages;
+      if (!collection) return [];
+
+      const all = Array.from(
+        collection.contents ?? collection.values?.() ?? []
+      );
+      all.sort((a, b) => a.timestamp - b.timestamp);
+      const last = all.slice(-limit);
+
+      return last.map((m) => ({
+        id: m.id,
+        canDelete: this._canDeleteMessage(m, game.user),
+        timestamp: m.timestamp,
+        message: m
+      }));
+    }
+
+    /**
+     * Helper function for permission checking (mirroring V1's canDeleteMessage)
+     */
+    _canDeleteMessage(msg, user) {
+      try {
+        if (user?.isGM) return true;
+        if (typeof msg?.canUserModify === "function")
+          return msg.canUserModify(user, "delete");
+        if ("isOwner" in msg) return !!msg.isOwner;
+      } catch (e) {
+        /* ignore */
+      }
+      return false;
+    }
+
+    /**
+     * Helper function for bulk delete (mirroring V1's deleteMessagesByIds)
+     */
+    async _deleteMessagesByIds(ids) {
+      const coll = game.messages;
+      if (coll && typeof coll.deleteDocuments === "function") {
+        return coll.deleteDocuments(ids);
+      }
+      if (typeof ChatMessage?.deleteDocuments === "function") {
+        return ChatMessage.deleteDocuments(ids);
+      }
+      // Fallback: delete one-by-one
+      for (const id of ids) {
+        const m = game.messages.get(id);
+        if (m && typeof m.delete === "function") {
+          // eslint-disable-next-line no-await-in-loop
+          await m.delete();
+        }
+      }
+    }
+
+    /**
+     * Delete Selected Messages Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static async _deleteSelected(event, target) {
+      event.preventDefault();
+      const ids = Array.from(this.element.querySelectorAll("input.sel[type=checkbox]:checked"))
+        .map(el => el.value);
+
+      if (!ids.length) {
+        return ui.notifications?.warn?.("No messages selected.");
+      }
+
+      const ok = await Dialog.confirm({
+        title: "Delete Selected Messages",
+        content: `<p>Delete ${ids.length} selected message(s)? This cannot be undone.</p>`,
+      });
+      if (!ok) return;
+
+      await this._deleteByIds(ids);
+    }
+
+    /**
+     * Delete Newer Than Anchor Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static async _deleteNewerThanAnchor(event, target) {
+      event.preventDefault();
+      const anchorInput = this.element.querySelector("input.anchor[type=radio]:checked");
+      const anchorId = anchorInput?.value;
+      
+      if (!anchorId) {
+        return ui.notifications?.warn?.("Choose an anchor message first.");
+      }
+
+      const rows = this._getLastMessages(200);
+      const idx = rows.findIndex((r) => r.id === anchorId);
+      if (idx === -1) {
+        return ui.notifications?.error?.("Anchor message not found.");
+      }
+
+      const newer = rows.slice(idx + 1);
+      const ids = newer.filter((r) => r.canDelete).map((r) => r.id);
+      const blocked = newer.filter((r) => !r.canDelete).length;
+
+      if (!ids.length) {
+        return ui.notifications?.info?.(
+          "No deletable messages newer than the selected anchor."
+        );
+      }
+
+      const ok = await Dialog.confirm({
+        title: "Delete Newer Than Anchor",
+        content: `<p>Delete ${ids.length} newer message(s) than the selected anchor? ${
+          blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+        }</p>`,
+      });
+      if (!ok) return;
+
+      await this._deleteByIds(ids);
+    }
+
+    /**
+     * Delete Older Than Anchor Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static async _deleteOlderThanAnchor(event, target) {
+      event.preventDefault();
+      const anchorInput = this.element.querySelector("input.anchor[type=radio]:checked");
+      const anchorId = anchorInput?.value;
+      
+      if (!anchorId) {
+        return ui.notifications?.warn?.("Choose an anchor message first.");
+      }
+
+      const rows = this._getLastMessages(200);
+      const idx = rows.findIndex((r) => r.id === anchorId);
+      if (idx === -1) {
+        return ui.notifications?.error?.("Anchor message not found.");
+      }
+
+      const older = rows.slice(0, idx);
+      const ids = older.filter((r) => r.canDelete).map((r) => r.id);
+      const blocked = older.filter((r) => !r.canDelete).length;
+
+      if (!ids.length) {
+        return ui.notifications?.info?.(
+          "No deletable messages older than the selected anchor."
+        );
+      }
+
+      const ok = await Dialog.confirm({
+        title: "Delete Older Than Anchor",
+        content: `<p>Delete ${ids.length} older message(s) than the selected anchor? ${
+          blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+        }</p>`,
+      });
+      if (!ok) return;
+
+      await this._deleteByIds(ids);
+    }
+
+    /**
+     * Refresh Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static _refresh(event, target) {
+      event.preventDefault();
+      this.render(true);
+    }
+
+    /**
+     * About Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static _about(event, target) {
+      event.preventDefault();
+      new Dialog({
+        title: "About Chat Pruner",
+        content: `<p><strong>Chat Pruner V2</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
+                  <p>Compatible with Foundry VTT v12–v13. UI uses ApplicationV2 with HandlebarsApplicationMixin.</p>
+                  <p>For V1 interface: <code>game.modules.get('${MOD}')?.api?.open()</code></p>`,
+        buttons: { ok: { label: "OK" } },
+      }).render(true);
+    }
+
+    /**
+     * Toggle Select All Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static _toggleSelectAll(event, target) {
+      const checked = target.checked;
+      this.element.querySelectorAll("input.sel[type=checkbox]:not(:disabled)")
+        .forEach(cb => {
+          cb.checked = checked;
+          cb.dispatchEvent(new Event('change'));
+        });
+    }
+
+    /**
+     * Toggle Row Selection Action
+     * @this {ChatPrunerAppV2}
+     * @param {PointerEvent} event
+     * @param {HTMLElement} target
+     */
+    static _toggleRowSelection(event, target) {
+      // Find the checkbox in this row and toggle it
+      const row = target.closest('.pruner-row');
+      const checkbox = row?.querySelector('input.sel[type=checkbox]');
+      if (checkbox && !checkbox.disabled) {
+        checkbox.checked = !checkbox.checked;
+        checkbox.dispatchEvent(new Event('change'));
+      }
+    }
+
+    /**
+     * Helper method to handle delete operations
+     * @param {string[]} ids Message IDs to delete
+     */
+    async _deleteByIds(ids) {
+      const deletable = ids.filter((id) => {
+        const m = game.messages.get(id);
+        return m && this._canDeleteMessage(m, game.user);
+      });
+
+      if (!deletable.length) {
+        return ui.notifications?.error?.(
+          "You don't have permission to delete the selected messages."
+        );
+      }
+
+      try {
+        await this._deleteMessagesByIds(deletable);
+        ui.notifications?.info?.(`Deleted ${deletable.length} message(s).`);
+        this.render(true);
+      } catch (err) {
+        console.error(`${MOD} | delete failed`, err);
+        ui.notifications?.error?.(
+          "Some messages could not be deleted. See console for details."
+        );
+      }
     }
 
     /** Convenience static to open V2 */

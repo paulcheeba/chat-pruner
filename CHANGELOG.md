@@ -2,24 +2,60 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.4.8] - 2025-10-13
+
+### 🎉 **MAJOR**: V2 Full Functionality Implementation
+- **Complete V1 Feature Parity**: V2 now has all V1 functionality using ApplicationV2 patterns
+- **ApplicationV2 Actions System**: Implemented proper action handlers for all buttons
+- **Real Permission Checking**: V2 now uses actual message permissions, not read-only placeholders
+- **Interactive Elements**: Enabled checkboxes, radio buttons, and all user interactions
+- **Full Delete Operations**: Select, newer/older than anchor, with proper confirmations
+
+### Added
+- Static action methods following ApplicationV2 conversion guide patterns:
+  - `_deleteSelected`, `_deleteNewerThanAnchor`, `_deleteOlderThanAnchor`
+  - `_refresh`, `_about`, `_toggleSelectAll`, `_toggleRowSelection`
+- Real permission checking with `_canDeleteMessage` method
+- Bulk delete functionality with `_deleteMessagesByIds` helper
+- Proper event handling through ApplicationV2 actions system
+- Interactive template with `data-action` attributes for all controls
+
+### Enhanced
+- Template updated to enable all interactive elements (removed `disabled` attributes)
+- Permission-based checkbox enabling/disabling
+- V2 interface now provides full chat management capabilities
+- Comprehensive error handling and user feedback
+
+### Technical Notes
+- Follows ApplicationV2 conversion guide action patterns exactly
+- Uses static methods with `@this` binding for proper ApplicationV2 integration
+- Maintains compatibility with V1 while providing modern V2 experience
+- **V2 IS NOW FULLY FUNCTIONAL** - no longer a preview/read-only interface
+
+---
+
 ## [13.1.4.7] - 2025-10-12
 
 ### Enhanced
+
 - **V2 Template Redesign**: Complete overhaul of chat-pruner-v2.hbs to match V1 functionality
 - V2 interface now includes checkboxes, anchor radios, and action buttons (read-only for now)
 - Enhanced data preparation to provide `full` text for tooltips and `canDelete` permissions
 - Improved V2 UI consistency with established V1 design patterns
 
 ### Added
+
 - V2 preview mode notification with instructions to use V1 for full functionality
 - Enhanced tooltip support showing full message content in V2
 - Disabled action buttons in V2 with clear visual indication of read-only status
 
 ### Changed
+
 - V2 template structure now mirrors V1 layout for consistent user experience
 - Version headers updated across all files
 
 ### UI Improvements
+
 - V2 interface now displays proper column headers (Select, Anchor, Speaker, Time, Preview)
 - Consistent styling using existing CSS classes from V1
 - Clear indication that V2 is in preview/read-only mode
