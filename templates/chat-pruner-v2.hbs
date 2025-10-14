@@ -1,6 +1,6 @@
 {{!
 Chat Pruner - V2 Template
-Version: 13.1.4.8
+Version: 13.1.4.10
 Description: ApplicationV2 interface with full V1 functionality
 }}
 <section class="pruner-wrap">
@@ -26,10 +26,10 @@ Description: ApplicationV2 interface with full V1 functionality
 
   <ol class="pruner-list">
     {{#each rows as |row|}}
-    <li class="pruner-row {{#unless row.canDelete}}locked{{/unless}}" data-id="{{row.id}}" data-action="toggleRowSelection">
+    <li class="pruner-row" data-id="{{row.id}}">
       <div class="cells">
         <div class="cell cb">
-          <input class="sel" type="checkbox" value="{{row.id}}" {{#unless row.canDelete}}disabled{{/unless}}>
+          <input class="sel" type="checkbox" value="{{row.id}}">
         </div>
         <div class="cell anchor">
           <input class="anchor" type="radio" name="anchor" value="{{row.id}}">
@@ -46,7 +46,6 @@ Description: ApplicationV2 interface with full V1 functionality
         <!-- Use native browser tooltip: put the FULL text in title -->
         <div class="cell content" title="{{row.full}}">
           {{row.preview}}
-          {{#unless row.canDelete}} <em class="note">[no delete permission]</em> {{/unless}}
         </div>
       </div>
     </li>

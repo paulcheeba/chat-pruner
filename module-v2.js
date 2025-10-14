@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.9
+ * Version: 13.1.4.10
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with full V1 functionality
  */
@@ -90,7 +90,7 @@ if (ApplicationV2Class) {
         all.sort((a, b) => a.timestamp - b.timestamp);
         const last = all.slice(-LIMIT);
 
-        // Shape a data structure matching V1's template requirements with proper permissions
+        // Shape a data structure matching V1's template requirements - simplified for GM-only access
         const rows = last.map((m) => ({
           id: m.id,
           ts: m.timestamp,
@@ -101,7 +101,6 @@ if (ApplicationV2Class) {
             .replace(/<[^>]+>/g, "")
             .slice(0, 140),
           full: (m.flavor || m.content || "").replace(/<[^>]+>/g, ""), // Full text for tooltip
-          canDelete: this._canDeleteMessage(m, game.user), // Real permission check for V2 functionality
         }));
 
         const result = {
@@ -154,25 +153,9 @@ if (ApplicationV2Class) {
 
       return last.map((m) => ({
         id: m.id,
-        canDelete: this._canDeleteMessage(m, game.user),
         timestamp: m.timestamp,
         message: m,
       }));
-    }
-
-    /**
-     * Helper function for permission checking (mirroring V1's canDeleteMessage)
-     */
-    _canDeleteMessage(msg, user) {
-      try {
-        if (user?.isGM) return true;
-        if (typeof msg?.canUserModify === "function")
-          return msg.canUserModify(user, "delete");
-        if ("isOwner" in msg) return !!msg.isOwner;
-      } catch (e) {
-        /* ignore */
-      }
-      return false;
     }
 
     /**
@@ -362,29 +345,14 @@ if (ApplicationV2Class) {
     }
 
     /**
-     * Toggle Row Selection Action
-     * @this {ChatPrunerAppV2}
-     * @param {PointerEvent} event
-     * @param {HTMLElement} target
-     */
-    static _toggleRowSelection(event, target) {
-      // Find the checkbox in this row and toggle it
-      const row = target.closest(".pruner-row");
-      const checkbox = row?.querySelector("input.sel[type=checkbox]");
-      if (checkbox && !checkbox.disabled) {
-        checkbox.checked = !checkbox.checked;
-        checkbox.dispatchEvent(new Event("change"));
-      }
-    }
-
-    /**
      * Helper method to handle delete operations
      * @param {string[]} ids Message IDs to delete
      */
     async _deleteByIds(ids) {
+      // Since only GMs can access the app, assume all messages can be deleted
       const deletable = ids.filter((id) => {
         const m = game.messages.get(id);
-        return m && this._canDeleteMessage(m, game.user);
+        return m; // Just check message exists
       });
 
       if (!deletable.length) {
@@ -456,7 +424,6 @@ if (ApplicationV2Class) {
     refresh: ChatPrunerAppV2._refresh,
     about: ChatPrunerAppV2._about,
     toggleSelectAll: ChatPrunerAppV2._toggleSelectAll,
-    toggleRowSelection: ChatPrunerAppV2._toggleRowSelection,
   };
 } else {
   // ApplicationV2 not available - create a no-op class
