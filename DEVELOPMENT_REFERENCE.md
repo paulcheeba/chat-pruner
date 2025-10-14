@@ -1,6 +1,6 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.4.11**
+**Version: 13.1.4.12**
 
 ## 🏗️ Project Overview
 
@@ -9,7 +9,7 @@
 **Compatibility**: Foundry VTT v13 (ApplicationV2 required)
 **Current Stable**: v1.3.2
 **Current Baseline**: v13.1.4.7 ⭐ **(BASELINE)**
-**Current Development**: v13.1.4.11 ⭐ **(ACTIVE BRANCH - Form Interaction Fixes)**
+**Current Development**: v13.1.4.12 ⭐ **(ACTIVE BRANCH - V13 Compatibility & DialogV2 Migration)**
 
 ## 📚 Essential References
 
@@ -94,7 +94,32 @@
 - ✅ Message hover tooltips working
 - ⚠️ Radio buttons still problematic (fixed in v13.1.4.11)
 
-## �🔧 Technical Architecture
+### **v13.1.4.11 → v13.1.4.12: V13 Compatibility & DialogV2 Migration**
+
+**Problems Identified:**
+- ❌ Radio buttons still not rendering (V13 CSS changes)
+- ❌ V1 Application deprecation warnings from `Dialog.confirm()` usage
+- ❌ V13 changed form elements to use FontAwesome icons, affecting visibility
+
+**Root Causes:**
+- V13 changed checkbox/radio button styling to FontAwesome icons
+- Old `Dialog.confirm()` uses deprecated V1 Application framework
+- Need `appearance: auto` to override V13's custom form styling
+- Missing specific CSS overrides for V13 form element changes
+
+**Solutions Applied:**
+- ✅ Replace all `Dialog.confirm()` with `foundry.applications.api.DialogV2.confirm()`
+- ✅ Replace `new Dialog()` with `foundry.applications.api.DialogV2.prompt()`
+- ✅ Add explicit CSS overrides for radio buttons with `appearance: auto`
+- ✅ Force native form element appearance with `!important` rules
+- ✅ Ensure proper z-index and dimensions for form elements
+
+**V13 Compatibility Notes:**
+- DialogV2.confirm() uses `window: { title }` instead of `title` property
+- DialogV2.prompt() uses `ok: { label }` instead of `buttons: { ok: { label } }`
+- Form elements require explicit `appearance: auto` in V13 to show native controls
+
+## � Technical Architecture
 
 ### 📁 File Structure
 

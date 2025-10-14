@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - Styles
- * Version: 13.1.4.11
+ * Version: 13.1.4.12
  * Description: Styling for both V1 and V2 interfaces
  */
 
@@ -107,13 +107,12 @@
 .cell.cb input[type="checkbox"],
 .cell.anchor input[type="radio"] {
   cursor: pointer;
-  opacity: 1 !important;
-  visibility: visible !important;
-  position: static !important;
-  width: auto !important;
-  height: auto !important;
-  margin: 0;
-  transform: none !important;
+  appearance: auto !important;
+  -webkit-appearance: auto !important;
+  -moz-appearance: auto !important;
+  width: 16px;
+  height: 16px;
+  margin: 2px;
 }
 
 .cell.time {

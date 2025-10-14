@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.11
+ * Version: 13.1.4.12
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with full V1 functionality
  */
@@ -134,6 +134,36 @@ if (ApplicationV2Class) {
       return this._prepareContext(_options);
     }
 
+    /**
+     * ApplicationV2 lifecycle method - called after DOM is rendered
+     * This is where we initialize form elements to ensure they're visible
+     */
+    _onRender(context, options) {
+      console.log(`${MOD} | _onRender called - initializing form elements`);
+      
+      // Force radio buttons and checkboxes to be properly rendered
+      // This fixes the "invisible until interaction" issue
+      const radioButtons = this.element.querySelectorAll('input[type="radio"]');
+      const checkboxes = this.element.querySelectorAll('input[type="checkbox"]');
+      
+      // Trigger a layout recalculation to ensure proper rendering
+      radioButtons.forEach(radio => {
+        // Force repaint by accessing offsetHeight
+        radio.offsetHeight;
+        // Ensure proper styling is applied
+        radio.style.display = 'inline-block';
+      });
+      
+      checkboxes.forEach(checkbox => {
+        // Force repaint by accessing offsetHeight  
+        checkbox.offsetHeight;
+        // Ensure proper styling is applied
+        checkbox.style.display = 'inline-block';
+      });
+      
+      console.log(`${MOD} | Form elements initialized - ${radioButtons.length} radios, ${checkboxes.length} checkboxes`);
+    }
+
     // ========================================
     // V2 Action Handlers (Static Methods)
     // ========================================
@@ -195,8 +225,8 @@ if (ApplicationV2Class) {
         return ui.notifications?.warn?.("No messages selected.");
       }
 
-      const ok = await Dialog.confirm({
-        title: "Delete Selected Messages",
+      const ok = await foundry.applications.api.DialogV2.confirm({
+        window: { title: "Delete Selected Messages" },
         content: `<p>Delete ${ids.length} selected message(s)? This cannot be undone.</p>`,
       });
       if (!ok) return;
@@ -237,8 +267,8 @@ if (ApplicationV2Class) {
         );
       }
 
-      const ok = await Dialog.confirm({
-        title: "Delete Newer Than Anchor",
+      const ok = await foundry.applications.api.DialogV2.confirm({
+        window: { title: "Delete Newer Than Anchor" },
         content: `<p>Delete ${
           ids.length
         } newer message(s) than the selected anchor? ${
@@ -285,8 +315,8 @@ if (ApplicationV2Class) {
         );
       }
 
-      const ok = await Dialog.confirm({
-        title: "Delete Older Than Anchor",
+      const ok = await foundry.applications.api.DialogV2.confirm({
+        window: { title: "Delete Older Than Anchor" },
         content: `<p>Delete ${
           ids.length
         } older message(s) than the selected anchor? ${
@@ -319,13 +349,13 @@ if (ApplicationV2Class) {
      */
     static _about(event, target) {
       event.preventDefault();
-      new Dialog({
-        title: "About Chat Pruner",
+      foundry.applications.api.DialogV2.prompt({
+        window: { title: "About Chat Pruner" },
         content: `<p><strong>Chat Pruner</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
                   <p>Compatible with Foundry VTT v13.</p>
                   <p>For V1 interface: <code>game.modules.get('${MOD}')?.api?.open()</code></p>`,
-        buttons: { ok: { label: "OK" } },
-      }).render(true);
+        ok: { label: "OK" }
+      });
     }
 
     /**
