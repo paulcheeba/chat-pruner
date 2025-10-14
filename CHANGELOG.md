@@ -2,9 +2,72 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.5.0] - 2025-01-27 - 🌟 **STABLE BASELINE ESTABLISHED**
+
+### 🎉 **MAJOR MILESTONE**: Complete ApplicationV2 Migration & V13 Compatibility
+
+This release establishes **v13.1.5.0** as the new stable baseline, representing the successful completion of the ApplicationV2 migration with full V13 compatibility and production-ready quality.
+
+### 🚀 **Key Achievements**
+
+#### **ApplicationV2 Framework Complete**
+
+- ✅ **Full V1 Feature Parity**: Complete migration from V1 Application to ApplicationV2
+- ✅ **Lifecycle Methods**: Proper implementation of `_onRender`, `_prepareContext`, and all ApplicationV2 patterns
+- ✅ **HandlebarsApplicationMixin**: Correct integration for template rendering
+- ✅ **Action System**: Complete replacement of `activateListeners()` with ApplicationV2 actions
+
+#### **Form Interaction Resolution**
+
+- ✅ **Radio Button Fix**: Resolved invisibility issues through proper lifecycle management and CSS overrides
+- ✅ **Checkbox Functionality**: All form elements now work perfectly with user interactions
+- ✅ **CSS Compatibility**: Added `appearance: auto` overrides for V13 form element styling
+- ✅ **Event Handling**: Proper form initialization in `_onRender` lifecycle method
+
+#### **V13 Compatibility Complete**
+
+- ✅ **DialogV2 Migration**: Complete replacement of deprecated `Dialog.confirm()` with `DialogV2.confirm()`
+- ✅ **API Updates**: Updated all dialog usage to V13-compatible patterns
+- ✅ **Deprecation Warnings**: Eliminated all V1 Application deprecation warnings
+- ✅ **Modern Foundry APIs**: Full adoption of current Foundry VTT API standards
+
+### 🔧 **Technical Improvements**
+
+#### **Code Quality & Architecture**
+
+- **Proper Lifecycle Management**: Implemented `_onRender` for form element initialization
+- **Error Handling**: Enhanced error handling for all operations
+- **Permission System**: Robust permission checking for message deletion
+- **Clean Code Structure**: Well-organized ApplicationV2 patterns throughout
+
+#### **User Experience**
+
+- **Responsive Interface**: All form elements work immediately upon rendering
+- **Clear Feedback**: Proper user feedback for all operations
+- **Intuitive Controls**: Radio buttons and checkboxes behave as expected
+- **Reliable Operations**: All delete operations work consistently
+
+### 🧪 **Development Journey Highlights**
+
+- **v13.1.4.7**: Initial ApplicationV2 template rendering
+- **v13.1.4.8**: Full V1 functionality implementation
+- **v13.1.4.9-11**: Form interaction debugging and fixes
+- **v13.1.4.12**: V13 compatibility and DialogV2 migration
+- **v13.1.5.0**: **Stable baseline establishment** ⭐
+
+### 📋 **Production Ready Status**
+
+- **User Testing**: Confirmed "working as expected" through comprehensive testing
+- **Quality Assurance**: All major functionality verified and stable
+- **Documentation**: Complete development reference and changelog
+- **Future Ready**: Solid foundation for all future Chat Pruner development
+
+---
+
 ## [13.1.4.8] - 2025-10-13
 
 ### 🎉 **MAJOR**: V2 Full Functionality Implementation
+
 - **Complete V1 Feature Parity**: V2 now has all V1 functionality using ApplicationV2 patterns
 - **ApplicationV2 Actions System**: Implemented proper action handlers for all buttons
 - **Real Permission Checking**: V2 now uses actual message permissions, not read-only placeholders
@@ -12,6 +75,7 @@ All notable changes to this project will be documented in this file.
 - **Full Delete Operations**: Select, newer/older than anchor, with proper confirmations
 
 ### Added
+
 - Static action methods following ApplicationV2 conversion guide patterns:
   - `_deleteSelected`, `_deleteNewerThanAnchor`, `_deleteOlderThanAnchor`
   - `_refresh`, `_about`, `_toggleSelectAll`, `_toggleRowSelection`
@@ -21,12 +85,14 @@ All notable changes to this project will be documented in this file.
 - Interactive template with `data-action` attributes for all controls
 
 ### Enhanced
+
 - Template updated to enable all interactive elements (removed `disabled` attributes)
 - Permission-based checkbox enabling/disabling
 - V2 interface now provides full chat management capabilities
 - Comprehensive error handling and user feedback
 
 ### Technical Notes
+
 - Follows ApplicationV2 conversion guide action patterns exactly
 - Uses static methods with `@this` binding for proper ApplicationV2 integration
 - Maintains compatibility with V1 while providing modern V2 experience

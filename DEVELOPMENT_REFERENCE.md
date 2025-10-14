@@ -1,15 +1,15 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.4.12**
+**Version: 13.1.5.0 - STABLE BASELINE**
 
 ## 🏗️ Project Overview
 
 **Module ID**: `fvtt-chat-pruner`
 **Repository**: `paulcheeba/chat-pruner`
 **Compatibility**: Foundry VTT v13 (ApplicationV2 required)
-**Current Stable**: v1.3.2
-**Current Baseline**: v13.1.4.7 ⭐ **(BASELINE)**
-**Current Development**: v13.1.4.12 ⭐ **(ACTIVE BRANCH - V13 Compatibility & DialogV2 Migration)**
+**Current Stable**: v13.1.5.0 ⭐ **(STABLE BASELINE - ApplicationV2 Complete)**
+**Previous Baseline**: v13.1.4.7
+**Last Development**: v13.1.4.12 _(Promoted to v13.1.5.0)_
 
 ## 📚 Essential References
 
@@ -97,17 +97,20 @@
 ### **v13.1.4.11 → v13.1.4.12: V13 Compatibility & DialogV2 Migration**
 
 **Problems Identified:**
+
 - ❌ Radio buttons still not rendering (V13 CSS changes)
 - ❌ V1 Application deprecation warnings from `Dialog.confirm()` usage
 - ❌ V13 changed form elements to use FontAwesome icons, affecting visibility
 
 **Root Causes:**
+
 - V13 changed checkbox/radio button styling to FontAwesome icons
 - Old `Dialog.confirm()` uses deprecated V1 Application framework
 - Need `appearance: auto` to override V13's custom form styling
 - Missing specific CSS overrides for V13 form element changes
 
 **Solutions Applied:**
+
 - ✅ Replace all `Dialog.confirm()` with `foundry.applications.api.DialogV2.confirm()`
 - ✅ Replace `new Dialog()` with `foundry.applications.api.DialogV2.prompt()`
 - ✅ Add explicit CSS overrides for radio buttons with `appearance: auto`
@@ -115,11 +118,38 @@
 - ✅ Ensure proper z-index and dimensions for form elements
 
 **V13 Compatibility Notes:**
+
 - DialogV2.confirm() uses `window: { title }` instead of `title` property
 - DialogV2.prompt() uses `ok: { label }` instead of `buttons: { ok: { label } }`
 - Form elements require explicit `appearance: auto` in V13 to show native controls
 
-## � Technical Architecture
+### **v13.1.4.12 → v13.1.5.0: STABLE BASELINE ESTABLISHED** ⭐
+
+**Achievement Summary:**
+
+- ✅ Complete ApplicationV2 implementation with full V1 feature parity
+- ✅ All form interaction issues resolved (radio buttons, checkboxes working perfectly)
+- ✅ V13 compatibility fully achieved with DialogV2 migration
+- ✅ All deprecation warnings eliminated
+- ✅ User testing confirms "working as expected"
+- ✅ Production-ready stable implementation
+
+**Baseline Status:**
+
+- **v13.1.5.0** established as new stable baseline for all future development
+- All ApplicationV2 lifecycle methods properly implemented (`_onRender`, `_prepareContext`)
+- Complete DialogV2 migration for V13 compatibility
+- Comprehensive CSS fixes for V13 form element styling
+- Ready for production deployment and future feature development
+
+**Key Accomplishments:**
+
+- Successfully migrated from V1 Application to ApplicationV2 framework
+- Resolved complex form interaction issues through proper lifecycle management
+- Achieved complete V13 compatibility with modern Foundry APIs
+- Established solid foundation for future Chat Pruner development
+
+## 🏛️ Technical Architecture
 
 ### 📁 File Structure
 

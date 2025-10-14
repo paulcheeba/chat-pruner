@@ -1,8 +1,8 @@
 /**
- * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.12
+ * Chat Pruner - ApplicationV2 Module (Stable Baseline)
+ * Version: 13.1.5.0
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
- * Description: Modern ApplicationV2 implementation with full V1 functionality
+ * Description: Modern ApplicationV2 implementation with full V1 functionality - STABLE BASELINE
  */
 
 // Chat Pruner — Application V2 (additive, keeps v1 intact)
@@ -140,28 +140,32 @@ if (ApplicationV2Class) {
      */
     _onRender(context, options) {
       console.log(`${MOD} | _onRender called - initializing form elements`);
-      
+
       // Force radio buttons and checkboxes to be properly rendered
       // This fixes the "invisible until interaction" issue
       const radioButtons = this.element.querySelectorAll('input[type="radio"]');
-      const checkboxes = this.element.querySelectorAll('input[type="checkbox"]');
-      
+      const checkboxes = this.element.querySelectorAll(
+        'input[type="checkbox"]'
+      );
+
       // Trigger a layout recalculation to ensure proper rendering
-      radioButtons.forEach(radio => {
+      radioButtons.forEach((radio) => {
         // Force repaint by accessing offsetHeight
         radio.offsetHeight;
         // Ensure proper styling is applied
-        radio.style.display = 'inline-block';
+        radio.style.display = "inline-block";
       });
-      
-      checkboxes.forEach(checkbox => {
-        // Force repaint by accessing offsetHeight  
+
+      checkboxes.forEach((checkbox) => {
+        // Force repaint by accessing offsetHeight
         checkbox.offsetHeight;
         // Ensure proper styling is applied
-        checkbox.style.display = 'inline-block';
+        checkbox.style.display = "inline-block";
       });
-      
-      console.log(`${MOD} | Form elements initialized - ${radioButtons.length} radios, ${checkboxes.length} checkboxes`);
+
+      console.log(
+        `${MOD} | Form elements initialized - ${radioButtons.length} radios, ${checkboxes.length} checkboxes`
+      );
     }
 
     // ========================================
@@ -354,7 +358,7 @@ if (ApplicationV2Class) {
         content: `<p><strong>Chat Pruner</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
                   <p>Compatible with Foundry VTT v13.</p>
                   <p>For V1 interface: <code>game.modules.get('${MOD}')?.api?.open()</code></p>`,
-        ok: { label: "OK" }
+        ok: { label: "OK" },
       });
     }
 
