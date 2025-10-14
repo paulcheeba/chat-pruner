@@ -38,15 +38,7 @@ if (ApplicationV2Class) {
       tag: "section",
       classes: ["fvtt-chat-pruner", "fvtt-chat-pruner-v2"],
       position: { width: 640, height: 480, top: null, left: null },
-      actions: {
-        deleteSelected: ChatPrunerAppV2._deleteSelected,
-        deleteNewer: ChatPrunerAppV2._deleteNewerThanAnchor,
-        deleteOlder: ChatPrunerAppV2._deleteOlderThanAnchor,
-        refresh: ChatPrunerAppV2._refresh,
-        about: ChatPrunerAppV2._about,
-        toggleSelectAll: ChatPrunerAppV2._toggleSelectAll,
-        toggleRowSelection: ChatPrunerAppV2._toggleRowSelection,
-      },
+      actions: {},
     };
 
     /**
@@ -164,7 +156,7 @@ if (ApplicationV2Class) {
         id: m.id,
         canDelete: this._canDeleteMessage(m, game.user),
         timestamp: m.timestamp,
-        message: m
+        message: m,
       }));
     }
 
@@ -212,8 +204,9 @@ if (ApplicationV2Class) {
      */
     static async _deleteSelected(event, target) {
       event.preventDefault();
-      const ids = Array.from(this.element.querySelectorAll("input.sel[type=checkbox]:checked"))
-        .map(el => el.value);
+      const ids = Array.from(
+        this.element.querySelectorAll("input.sel[type=checkbox]:checked")
+      ).map((el) => el.value);
 
       if (!ids.length) {
         return ui.notifications?.warn?.("No messages selected.");
@@ -236,9 +229,11 @@ if (ApplicationV2Class) {
      */
     static async _deleteNewerThanAnchor(event, target) {
       event.preventDefault();
-      const anchorInput = this.element.querySelector("input.anchor[type=radio]:checked");
+      const anchorInput = this.element.querySelector(
+        "input.anchor[type=radio]:checked"
+      );
       const anchorId = anchorInput?.value;
-      
+
       if (!anchorId) {
         return ui.notifications?.warn?.("Choose an anchor message first.");
       }
@@ -261,8 +256,12 @@ if (ApplicationV2Class) {
 
       const ok = await Dialog.confirm({
         title: "Delete Newer Than Anchor",
-        content: `<p>Delete ${ids.length} newer message(s) than the selected anchor? ${
-          blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+        content: `<p>Delete ${
+          ids.length
+        } newer message(s) than the selected anchor? ${
+          blocked
+            ? `<em>(${blocked} not deletable due to permissions)</em>`
+            : ""
         }</p>`,
       });
       if (!ok) return;
@@ -278,9 +277,11 @@ if (ApplicationV2Class) {
      */
     static async _deleteOlderThanAnchor(event, target) {
       event.preventDefault();
-      const anchorInput = this.element.querySelector("input.anchor[type=radio]:checked");
+      const anchorInput = this.element.querySelector(
+        "input.anchor[type=radio]:checked"
+      );
       const anchorId = anchorInput?.value;
-      
+
       if (!anchorId) {
         return ui.notifications?.warn?.("Choose an anchor message first.");
       }
@@ -303,8 +304,12 @@ if (ApplicationV2Class) {
 
       const ok = await Dialog.confirm({
         title: "Delete Older Than Anchor",
-        content: `<p>Delete ${ids.length} older message(s) than the selected anchor? ${
-          blocked ? `<em>(${blocked} not deletable due to permissions)</em>` : ""
+        content: `<p>Delete ${
+          ids.length
+        } older message(s) than the selected anchor? ${
+          blocked
+            ? `<em>(${blocked} not deletable due to permissions)</em>`
+            : ""
         }</p>`,
       });
       if (!ok) return;
@@ -348,10 +353,11 @@ if (ApplicationV2Class) {
      */
     static _toggleSelectAll(event, target) {
       const checked = target.checked;
-      this.element.querySelectorAll("input.sel[type=checkbox]:not(:disabled)")
-        .forEach(cb => {
+      this.element
+        .querySelectorAll("input.sel[type=checkbox]:not(:disabled)")
+        .forEach((cb) => {
           cb.checked = checked;
-          cb.dispatchEvent(new Event('change'));
+          cb.dispatchEvent(new Event("change"));
         });
     }
 
@@ -363,11 +369,11 @@ if (ApplicationV2Class) {
      */
     static _toggleRowSelection(event, target) {
       // Find the checkbox in this row and toggle it
-      const row = target.closest('.pruner-row');
-      const checkbox = row?.querySelector('input.sel[type=checkbox]');
+      const row = target.closest(".pruner-row");
+      const checkbox = row?.querySelector("input.sel[type=checkbox]");
       if (checkbox && !checkbox.disabled) {
         checkbox.checked = !checkbox.checked;
-        checkbox.dispatchEvent(new Event('change'));
+        checkbox.dispatchEvent(new Event("change"));
       }
     }
 
@@ -440,6 +446,17 @@ if (ApplicationV2Class) {
         );
       }
     }
+  };
+
+  // Configure actions after class definition to avoid circular reference
+  ChatPrunerAppV2.DEFAULT_OPTIONS.actions = {
+    deleteSelected: ChatPrunerAppV2._deleteSelected,
+    deleteNewer: ChatPrunerAppV2._deleteNewerThanAnchor,
+    deleteOlder: ChatPrunerAppV2._deleteOlderThanAnchor,
+    refresh: ChatPrunerAppV2._refresh,
+    about: ChatPrunerAppV2._about,
+    toggleSelectAll: ChatPrunerAppV2._toggleSelectAll,
+    toggleRowSelection: ChatPrunerAppV2._toggleRowSelection,
   };
 } else {
   // ApplicationV2 not available - create a no-op class
