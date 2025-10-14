@@ -1,14 +1,15 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.4.7**
+**Version: 13.1.4.11**
 
 ## 🏗️ Project Overview
 
 **Module ID**: `fvtt-chat-pruner`
 **Repository**: `paulcheeba/chat-pruner`
-**Compatibility**: Foundry VTT v11-v13
+**Compatibility**: Foundry VTT v13 (ApplicationV2 required)
 **Current Stable**: v1.3.2
-**Current Development**: v13.1.4.7 ⭐ **(NEW BASELINE)**
+**Current Baseline**: v13.1.4.7 ⭐ **(BASELINE)**
+**Current Development**: v13.1.4.11 ⭐ **(ACTIVE BRANCH - Form Interaction Fixes)**
 
 ## 📚 Essential References
 
@@ -40,13 +41,60 @@
 2. **Full Releases**: Use `release.yml` workflow for production
 3. **Foundry Submission**: Use `foundry-release.yml` for official package registry
 
-### 📊 Versioning Strategy
+### 📊 Paul's Versioning Scheme
+
+**Module Version Format**: `v13.w.x.y.z`
+
+- **v13** → Compatible FVTT version
+- **w** → ATN major version (locked, stable, "everything perfect")
+- **x** → ATN test version, building on the current major
+- **y** → ATN test sub-version, building on the current test version
+- **z** → ATN test sub-version hotfix
+
+**Examples**:
+
+- `v13.1.4.10` = FVTT v13, ATN major v1, test v4, sub-version 10
+- `v13.2.0.0` = FVTT v13, ATN major v2 (stable milestone)
+- `v13.1.4.10.1` = FVTT v13, ATN major v1, test v4, sub-version 10, hotfix 1
+
+**Legacy Versioning**:
 
 - **Stable releases**: `v1.x.x` series (current: v1.3.2)
 - **V13 development**: `v13.1.x.x` series for Foundry v13 features
-- **Incremental**: Each fix/feature increments last digit
 
-## 🔧 Technical Architecture
+## � Recent Issues & Fixes
+
+### **v13.1.4.10 → v13.1.4.11: Form Interaction Issues**
+
+**Problems Identified:**
+
+- ❌ Radio buttons not rendering until clicked multiple times
+- ❌ Entire rows showing pointer cursor (acting like buttons)
+- ❌ "No deletable messages" error when using anchor operations
+- ❌ Leftover `canDelete` permission checks causing failures
+
+**Root Causes:**
+
+- CSS `cursor: pointer` on `.pruner-row` making entire rows appear clickable
+- Missing CSS overrides for radio button visibility in Foundry environment
+- Anchor deletion methods still filtering by `r.canDelete` (removed property)
+
+**Solutions Applied:**
+
+- ✅ Remove `cursor: pointer` from `.pruner-row` CSS
+- ✅ Add explicit CSS to ensure radio/checkbox visibility and interaction
+- ✅ Remove all `canDelete` filtering from anchor deletion methods
+- ✅ Simplified permission model (GM-only access = all messages deletable)
+
+**Testing Results (v13.1.4.10):**
+
+- ✅ Checkboxes working properly
+- ✅ Delete Selected functional
+- ✅ Refresh, About, Select All working
+- ✅ Message hover tooltips working
+- ⚠️ Radio buttons still problematic (fixed in v13.1.4.11)
+
+## �🔧 Technical Architecture
 
 ### 📁 File Structure
 
@@ -256,6 +304,7 @@ try {
 ## 🔄 Recent Changes Log
 
 ### ⭐ v13.1.4.7 - NEW BASELINE: Complete ApplicationV2 Success
+
 - **MILESTONE**: Successfully implemented fully functional ApplicationV2 interface
 - Complete V2 template overhaul matching V1 functionality and design
 - Resolved all ApplicationV2 rendering issues using proper PARTS configuration
@@ -264,19 +313,22 @@ try {
 - **Status**: ApplicationV2 conversion complete - ready for future functionality expansion
 
 ### v13.1.4.6 - ApplicationV2 PARTS Configuration Fix
+
 - **CRITICAL**: Fixed empty content issue with proper static PARTS configuration
 - Replaced deprecated single template property with ApplicationV2 template parts system
 - Added ApplicationV2 conversion guide reference to Development Reference
 - Simplified implementation leveraging HandlebarsApplicationMixin correctly
 
 ### v13.1.4.5 - Deprecation Warning and Content Display
+
 - Fixed ChatMessage deprecation warning (m.user → m.author for v12+ compatibility)
-- Enhanced ApplicationV2 lifecycle method support with _preparePartContext
+- Enhanced ApplicationV2 lifecycle method support with \_preparePartContext
 - Added comprehensive debug logging for troubleshooting
 
 ### v13.1.4.4 - ApplicationV2 Render Method Implementation
+
 - Fixed ApplicationV2 render method errors with HandlebarsApplicationMixin integration
-- Added fallback _renderHTML and _replaceHTML methods for compatibility
+- Added fallback \_renderHTML and \_replaceHTML methods for compatibility
 - Enhanced ApplicationV2 compatibility with proper render method implementation
 
 ### v13.1.4.3 - Version Tracking & Development Workflow

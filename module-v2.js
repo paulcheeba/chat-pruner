@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Future Compatibility)
- * Version: 13.1.4.10
+ * Version: 13.1.4.11
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with full V1 functionality
  */
@@ -228,8 +228,8 @@ if (ApplicationV2Class) {
       }
 
       const newer = rows.slice(idx + 1);
-      const ids = newer.filter((r) => r.canDelete).map((r) => r.id);
-      const blocked = newer.filter((r) => !r.canDelete).length;
+      const ids = newer.map((r) => r.id); // No permission check needed - GM only access
+      const blocked = 0; // No blocked messages since only GMs can access
 
       if (!ids.length) {
         return ui.notifications?.info?.(
@@ -276,8 +276,8 @@ if (ApplicationV2Class) {
       }
 
       const older = rows.slice(0, idx);
-      const ids = older.filter((r) => r.canDelete).map((r) => r.id);
-      const blocked = older.filter((r) => !r.canDelete).length;
+      const ids = older.map((r) => r.id); // No permission check needed - GM only access
+      const blocked = 0; // No blocked messages since only GMs can access
 
       if (!ids.length) {
         return ui.notifications?.info?.(

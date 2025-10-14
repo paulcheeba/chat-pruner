@@ -1,13 +1,18 @@
 {{!
 Chat Pruner - V2 Template
-Version: 13.1.4.10
+Version: 13.1.4.11
 Description: ApplicationV2 interface with full V1 functionality
 }}
 <section class="pruner-wrap">
   <header class="pruner-head">
     <div class="left">
       <label title="Select/Deselect all" class="checkbox">
-        <input id="pruner-select-all" type="checkbox" data-action="toggleSelectAll"> Select All
+        <input
+          id="pruner-select-all"
+          type="checkbox"
+          data-action="toggleSelectAll"
+        />
+        Select All
       </label>
     </div>
     <div class="right">
@@ -26,45 +31,66 @@ Description: ApplicationV2 interface with full V1 functionality
 
   <ol class="pruner-list">
     {{#each rows as |row|}}
-    <li class="pruner-row" data-id="{{row.id}}">
-      <div class="cells">
-        <div class="cell cb">
-          <input class="sel" type="checkbox" value="{{row.id}}">
-        </div>
-        <div class="cell anchor">
-          <input class="anchor" type="radio" name="anchor" value="{{row.id}}">
-        </div>
-        <div class="cell speaker">
-          <div class="who">
-            <strong class="speaker-name">{{row.speaker}}</strong>
-            <span class="user">({{row.user}})</span>
+      <li class="pruner-row" data-id="{{row.id}}">
+        <div class="cells">
+          <div class="cell cb">
+            <input class="sel" type="checkbox" value="{{row.id}}" />
+          </div>
+          <div class="cell anchor">
+            <input
+              class="anchor"
+              type="radio"
+              name="anchor"
+              value="{{row.id}}"
+            />
+          </div>
+          <div class="cell speaker">
+            <div class="who">
+              <strong class="speaker-name">{{row.speaker}}</strong>
+              <span class="user">({{row.user}})</span>
+            </div>
+          </div>
+          <div class="cell time">
+            {{row.when}}
+          </div>
+          <!-- Use native browser tooltip: put the FULL text in title -->
+          <div class="cell content" title="{{row.full}}">
+            {{row.preview}}
           </div>
         </div>
-        <div class="cell time">
-          {{row.when}}
-        </div>
-        <!-- Use native browser tooltip: put the FULL text in title -->
-        <div class="cell content" title="{{row.full}}">
-          {{row.preview}}
-        </div>
-      </div>
-    </li>
+      </li>
     {{/each}}
   </ol>
 
   <footer class="pruner-foot">
     <div class="btns">
-      <button type="button" class="btn primary" data-action="deleteSelected"><i class="fas fa-trash"></i> Delete Selected</button>
-      <button type="button" class="btn" data-action="deleteNewer"><i class="fas fa-forward"></i> Delete newer than anchor</button>
-      <button type="button" class="btn" data-action="deleteOlder"><i class="fas fa-backward"></i> Delete older than anchor</button>
+      <button type="button" class="btn primary" data-action="deleteSelected"><i
+          class="fas fa-trash"
+        ></i>
+        Delete Selected</button>
+      <button type="button" class="btn" data-action="deleteNewer"><i
+          class="fas fa-forward"
+        ></i>
+        Delete newer than anchor</button>
+      <button type="button" class="btn" data-action="deleteOlder"><i
+          class="fas fa-backward"
+        ></i>
+        Delete older than anchor</button>
       <span class="spacer"></span>
-      <button type="button" class="btn ghost" data-action="refresh"><i class="fas fa-rotate"></i> Refresh</button>
-      <button type="button" class="btn ghost" data-action="about"><i class="fas fa-info-circle"></i> About</button>
+      <button type="button" class="btn ghost" data-action="refresh"><i
+          class="fas fa-rotate"
+        ></i>
+        Refresh</button>
+      <button type="button" class="btn ghost" data-action="about"><i
+          class="fas fa-info-circle"
+        ></i>
+        About</button>
     </div>
     <p class="tip">
-      <strong>V2 Interface:</strong> Full functionality enabled! 
-      Click rows to toggle selection, use radio buttons for anchors, and buttons for actions.
-      For V1 interface: <code>game.modules.get('fvtt-chat-pruner')?.api?.open()</code>
+      <strong>V2 Interface:</strong>
+      Full functionality enabled! Click rows to toggle selection, use radio
+      buttons for anchors, and buttons for actions. For V1 interface:
+      <code>game.modules.get('fvtt-chat-pruner')?.api?.open()</code>
     </p>
   </footer>
 </section>

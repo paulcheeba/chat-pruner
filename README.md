@@ -1,6 +1,6 @@
 # Chat Pruner
 
-**Current Version: 13.1.4.10**
+**Current Version: 13.1.4.11**
 
 Chat Pruner is a GM-only tool for tidying up your game's chat log.
 
