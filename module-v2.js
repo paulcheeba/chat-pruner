@@ -37,7 +37,7 @@ if (ApplicationV2Class) {
       },
       tag: "section",
       classes: ["fvtt-chat-pruner", "fvtt-chat-pruner-v2"],
-      position: { width: 640, height: 480, top: null, left: null },
+      position: { width: 720, height: 480, top: null, left: null },
       actions: {},
     };
 
@@ -339,8 +339,7 @@ if (ApplicationV2Class) {
       new Dialog({
         title: "About Chat Pruner",
         content: `<p><strong>Chat Pruner V2</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
-                  <p>Compatible with Foundry VTT v12–v13. UI uses ApplicationV2 with HandlebarsApplicationMixin.</p>
-                  <p>For V1 interface: <code>game.modules.get('${MOD}')?.api?.open()</code></p>`,
+                  <p>Compatible with Foundry VTT v13+.</p>,
         buttons: { ok: { label: "OK" } },
       }).render(true);
     }
