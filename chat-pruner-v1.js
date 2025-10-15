@@ -1,8 +1,8 @@
 /**
- * Chat Pruner - Main Module (Application V1)
- * Version: 13.1.5.2.1
+ * Chat Pruner - V1 Application (chat-pruner-v1.js)
+ * Version: 13.1.5.2.2
  * Compatible: Foundry VTT v11-v13
- * Description: GM-only chat pruning tool with multi-select delete and anchor functionality
+ * Description: GM-only chat pruning tool with smart V1/V2 detection and toolbar integration
  */
 
 // Import shared utilities
@@ -31,12 +31,18 @@ Hooks.on("getSceneControlButtons", (controls) => {
     if (now - _lastRun < CHAT_PRUNER_CONSTANTS.MIN_DEBOUNCE_DELAY) return;
     _lastRun = now;
     
-    // Phase 2: Try V2 first, fallback to V1
+    // Smart version detection: Choose best app for Foundry version
+    const foundryVersion = parseInt(game.version?.split('.')?.[0] ?? '0');
     const module = game.modules.get("fvtt-chat-pruner");
-    if (module?.api?.openV2) {
+    
+    if (foundryVersion >= 12 && module?.api?.openV2) {
+      // v12+: Use ApplicationV2 (modern interface)
       module.api.openV2();
     } else if (module?.api?.open) {
+      // v11 or V2 fallback: Use V1 Application (compatible)
       module.api.open();
+    } else {
+      ui.notifications?.error?.("Chat Pruner not available");
     }
   };
 
@@ -72,7 +78,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 
 Hooks.once("init", async () => {
   await loadTemplates([
-    `modules/${MOD}/templates/chat-pruner.hbs`,
+    `modules/${MOD}/templates/chat-pruner-v1.hbs`,
     `modules/${MOD}/templates/chat-pruner-v2.hbs`, // V2 additive template
   ]);
 });
@@ -104,7 +110,7 @@ class ChatPrunerApp extends Application {
     return foundry.utils.mergeObject(super.defaultOptions, {
       id: `${MOD}-window`,
       title: "Chat Pruner",
-      template: `modules/${MOD}/templates/chat-pruner.hbs`,
+      template: `modules/${MOD}/templates/chat-pruner-v1.hbs`,
       width: 840,
       height: 680,
       resizable: true,

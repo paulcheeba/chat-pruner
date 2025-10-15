@@ -255,7 +255,7 @@ This release establishes **v13.1.5.0** as the new stable baseline, representing 
 
 ### Technical
 
-- Added `module-v2.js` with ApplicationV2 implementation
+- Added `chat-pruner-v2.js` with ApplicationV2 implementation
 - Added `chat-pruner-v2.hbs` template for V2 interface
 - Updated `module.json` to include V2 assets
 - Added VS Code workspace configuration for development

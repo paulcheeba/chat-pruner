@@ -1,8 +1,8 @@
 /**
- * Chat Pruner - ApplicationV2 Module (Stable Baseline)
- * Version: 13.1.5.2.1
+ * Chat Pruner - V2 Application (chat-pruner-v2.js)
+ * Version: 13.1.5.2.2
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
- * Description: Modern ApplicationV2 implementation with full V1 functionality - STABLE BASELINE
+ * Description: Modern ApplicationV2 implementation with smart detection - STABLE BASELINE
  */
 
 // Import shared utilities

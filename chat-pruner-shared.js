@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - Shared Utilities
- * Version: 13.1.5.2.1
+ * Version: 13.1.5.2.2
  * Compatible: Foundry VTT v11-v13
  * Description: Shared code used by both V1 and V2 applications
  */

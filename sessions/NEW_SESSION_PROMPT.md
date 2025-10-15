@@ -14,9 +14,9 @@ I'm continuing development on Chat Pruner, a Foundry VTT module for managing cha
 
 ```
 chat-pruner/
-├── module.js           # V1 Application (legacy)
-├── module-v2.js        # V2 Application (STABLE - current implementation)
-├── module.json         # Manifest (v13.1.5.0)
+├── chat-pruner-v1.js   # V1 Application (legacy)
+├── chat-pruner-v2.js   # V2 Application (STABLE - current implementation)
+├── module.json         # Manifest (v13.1.5.2.2)
 ├── styles.css          # V13-compatible styling
 ├── templates/
 │   ├── chat-pruner.hbs     # V1 template
