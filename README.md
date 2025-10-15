@@ -35,34 +35,18 @@ Chat Pruner helps Game Masters maintain organized chat logs by providing flexibl
 
 ### Main Interface
 
-_[Screenshot Placeholder: Chat Pruner main window showing message list with checkboxes and radio buttons]_
+<img width="721" height="485" alt="image" src="https://github.com/user-attachments/assets/296e418c-0e6d-4ecc-8e7a-a99d7abaf818" />
 
-**Recommended Image**: Full Chat Pruner window showing:
-
-- Message list with various senders and timestamps
-- Some messages selected with checkboxes
-- One message selected as anchor with radio button
-- Action buttons at the bottom (Delete Selected, Delete Newer/Older, Refresh)
 
 ### Message Selection
 
-_[Screenshot Placeholder: Multiple messages selected for bulk deletion]_
+<img width="734" height="491" alt="image" src="https://github.com/user-attachments/assets/59f671a0-b9cc-4f1e-85fe-ebdeb0c7d448" />
 
-**Recommended Image**: Chat Pruner with 3-5 messages checked, showing:
-
-- Highlighted selected rows
-- Mixed message types (chat, rolls, system messages)
-- Clear visual distinction of selected vs unselected messages
 
 ### Anchor Operations
 
-_[Screenshot Placeholder: Anchor message selected with newer/older deletion options]_
+<img width="727" height="489" alt="image" src="https://github.com/user-attachments/assets/3bb008bb-c072-471c-bab7-8a40e1b694a1" />
 
-**Recommended Image**: Interface showing:
-
-- One message selected as anchor (radio button filled)
-- Hover state or tooltip showing full message content
-- Focus on the anchor-based action buttons
 
 ## 🚀 Installation
 
