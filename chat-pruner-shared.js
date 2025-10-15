@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - Shared Utilities
- * Version: 13.1.5.1.1
+ * Version: 13.1.5.1.2
  * Compatible: Foundry VTT v11-v13
  * Description: Shared code used by both V1 and V2 applications
  */
@@ -106,7 +106,8 @@ export function getLastMessages(
       ts,
       user,
       speaker,
-      content: previewText, // for on-screen preview
+      content: previewText, // for on-screen preview (V1 compatibility)
+      preview: previewText, // for on-screen preview (V2 compatibility)
       full: fullText, // for native browser tooltip
       canDelete: canDeleteMessage(m, game.user),
       message: m, // Include original message for advanced operations
