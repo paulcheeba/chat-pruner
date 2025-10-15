@@ -30,11 +30,11 @@ Hooks.on("getSceneControlButtons", (controls) => {
     const now = Date.now();
     if (now - _lastRun < CHAT_PRUNER_CONSTANTS.MIN_DEBOUNCE_DELAY) return;
     _lastRun = now;
-    
+
     // Smart version detection: Choose best app for Foundry version
-    const foundryVersion = parseInt(game.version?.split('.')?.[0] ?? '0');
+    const foundryVersion = parseInt(game.version?.split(".")?.[0] ?? "0");
     const module = game.modules.get("fvtt-chat-pruner");
-    
+
     if (foundryVersion >= 12 && module?.api?.openV2) {
       // v12+: Use ApplicationV2 (modern interface)
       module.api.openV2();

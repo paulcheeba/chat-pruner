@@ -14,7 +14,11 @@
       "name": "Paulcheeba/crusherDestroyer666"
     }
   ],
-  "esmodules": ["chat-pruner-shared.js", "chat-pruner-v1.js", "chat-pruner-v2.js"],
+  "esmodules": [
+    "chat-pruner-shared.js",
+    "chat-pruner-v1.js",
+    "chat-pruner-v2.js"
+  ],
   "styles": ["styles.css"],
   "templates": ["templates/chat-pruner-v1.hbs", "templates/chat-pruner-v2.hbs"],
   "license": "MIT",
