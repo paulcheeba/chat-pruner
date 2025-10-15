@@ -1,12 +1,22 @@
 /**
  * Chat Pruner - ApplicationV2 Module (Stable Baseline)
- * Version: 13.1.5.0
+ * Version: 13.1.5.1.1
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
  * Description: Modern ApplicationV2 implementation with full V1 functionality - STABLE BASELINE
  */
 
+// Import shared utilities
+import {
+  stripHTMLSafe,
+  canDeleteMessage,
+  deleteMessagesByIds,
+  getLastMessages,
+  performDeleteOperation,
+  CHAT_PRUNER_CONSTANTS,
+} from "./chat-pruner-shared.js";
+
 // Chat Pruner — Application V2 (additive, keeps v1 intact)
-const MOD = "fvtt-chat-pruner";
+const MOD = CHAT_PRUNER_CONSTANTS.MODULE_ID;
 
 // Only define V2 class if ApplicationV2 is available
 let ChatPrunerAppV2;
@@ -55,72 +65,15 @@ if (ApplicationV2Class) {
      * Helper function for permission checking (instance method for use in _prepareContext)
      */
     _canDeleteMessage(msg, user) {
-      try {
-        if (user?.isGM) return true;
-        if (typeof msg?.canUserModify === "function")
-          return msg.canUserModify(user, "delete");
-        if ("isOwner" in msg) return !!msg.isOwner;
-      } catch (e) {
-        /* ignore */
-      }
-      return false;
+      // Use shared utility function
+      return canDeleteMessage(msg, user);
     }
 
     /** V2 lifecycle — provide data to the template */
     async _prepareContext(_options = {}) {
       console.log(`${MOD} | _prepareContext called with options:`, _options);
-      // TODO: Verify ApplicationV2 lifecycle method name for FVTT v13
-      // Common methods: _prepareContext, _preparePartContext, _prepareApplicationContext
-      try {
-        // NOTE: Read-only view for now; mirrors v1's "last 200 messages" list, formatted minimally.
-        const LIMIT = 200;
-
-        // TODO: Verify game.messages Collection API for v13 - using defensive access
-        const collection = game.messages;
-        if (!collection) {
-          console.warn(`${MOD} | No game.messages collection available`);
-          return { count: 0, rows: [] };
-        }
-
-        // Use FVTT v13 Collection.contents instead of values() - safer API
-        const all = Array.from(
-          collection.contents ?? collection.values?.() ?? []
-        );
-        // Sort oldest → newest to match v1’s anchor-friendly order
-        all.sort((a, b) => a.timestamp - b.timestamp);
-        const last = all.slice(-LIMIT);
-
-        // Shape a data structure matching V1's template requirements - simplified for GM-only access
-        const rows = last.map((m) => ({
-          id: m.id,
-          ts: m.timestamp,
-          when: new Date(m.timestamp).toLocaleString(),
-          user: m.author?.name ?? m.user?.name ?? "—", // Use author (v12+) with fallback to user
-          speaker: m.speaker?.alias ?? m.speaker?.actor ?? "—",
-          preview: (m.flavor || m.content || "")
-            .replace(/<[^>]+>/g, "")
-            .slice(0, 140),
-          full: (m.flavor || m.content || "").replace(/<[^>]+>/g, ""), // Full text for tooltip
-        }));
-
-        const result = {
-          count: rows.length,
-          rows,
-        };
-
-        // Debug logging to help troubleshoot empty content
-        console.log(`${MOD} | _prepareContext result:`, {
-          messageCount: all.length,
-          limitedCount: last.length,
-          resultCount: result.count,
-          sampleRow: result.rows[0],
-        });
-
-        return result;
-      } catch (error) {
-        console.error(`${MOD} | Error in _prepareContext:`, error);
-        return { count: 0, rows: [], error: error.message };
-      }
+      const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
+      return { count: rows.length, rows };
     }
 
     /**
@@ -173,44 +126,10 @@ if (ApplicationV2Class) {
     // ========================================
 
     /**
-     * Helper function to get current messages data (mirroring V1's _getLastMessages)
-     */
-    _getLastMessages(limit = 200) {
-      const collection = game.messages;
-      if (!collection) return [];
-
-      const all = Array.from(
-        collection.contents ?? collection.values?.() ?? []
-      );
-      all.sort((a, b) => a.timestamp - b.timestamp);
-      const last = all.slice(-limit);
-
-      return last.map((m) => ({
-        id: m.id,
-        timestamp: m.timestamp,
-        message: m,
-      }));
-    }
-
-    /**
      * Helper function for bulk delete (mirroring V1's deleteMessagesByIds)
      */
     async _deleteMessagesByIds(ids) {
-      const coll = game.messages;
-      if (coll && typeof coll.deleteDocuments === "function") {
-        return coll.deleteDocuments(ids);
-      }
-      if (typeof ChatMessage?.deleteDocuments === "function") {
-        return ChatMessage.deleteDocuments(ids);
-      }
-      // Fallback: delete one-by-one
-      for (const id of ids) {
-        const m = game.messages.get(id);
-        if (m && typeof m.delete === "function") {
-          // eslint-disable-next-line no-await-in-loop
-          await m.delete();
-        }
-      }
+      return deleteMessagesByIds(ids);
     }
 
     /**
@@ -255,7 +174,7 @@ if (ApplicationV2Class) {
         return ui.notifications?.warn?.("Choose an anchor message first.");
       }
 
-      const rows = this._getLastMessages(200);
+      const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
       const idx = rows.findIndex((r) => r.id === anchorId);
       if (idx === -1) {
         return ui.notifications?.error?.("Anchor message not found.");
@@ -303,7 +222,7 @@ if (ApplicationV2Class) {
         return ui.notifications?.warn?.("Choose an anchor message first.");
       }
 
-      const rows = this._getLastMessages(200);
+      const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
       const idx = rows.findIndex((r) => r.id === anchorId);
       if (idx === -1) {
         return ui.notifications?.error?.("Anchor message not found.");
@@ -395,16 +314,10 @@ if (ApplicationV2Class) {
         );
       }
 
-      try {
-        await this._deleteMessagesByIds(deletable);
-        ui.notifications?.info?.(`Deleted ${deletable.length} message(s).`);
-        this.render(true);
-      } catch (err) {
-        console.error(`${MOD} | delete failed`, err);
-        ui.notifications?.error?.(
-          "Some messages could not be deleted. See console for details."
-        );
-      }
+      await performDeleteOperation(deletable, {
+        onSuccess: () => this.render(true),
+        onError: () => {}, // Error already handled by performDeleteOperation
+      });
     }
 
     /** Convenience static to open V2 */

@@ -1,9 +1,19 @@
 /**
  * Chat Pruner - Main Module (Application V1)
- * Version: 13.1.4.8
+ * Version: 13.1.5.1.1
  * Compatible: Foundry VTT v11-v13
  * Description: GM-only chat pruning tool with multi-select delete and anchor functionality
  */
+
+// Import shared utilities
+import {
+  stripHTMLSafe,
+  canDeleteMessage,
+  deleteMessagesByIds,
+  getLastMessages,
+  performDeleteOperation,
+  CHAT_PRUNER_CONSTANTS,
+} from "./chat-pruner-shared.js";
 
 // fvtt-chat-pruner — GM-only chat pruning tool (v11–v13) — Application (v1) only
 const MOD = "fvtt-chat-pruner";
@@ -18,7 +28,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
   let _lastRun = 0;
   const _openOnce = () => {
     const now = Date.now();
-    if (now - _lastRun < 250) return;
+    if (now - _lastRun < CHAT_PRUNER_CONSTANTS.MIN_DEBOUNCE_DELAY) return;
     _lastRun = now;
     game.modules.get("fvtt-chat-pruner")?.api?.open?.();
   };
@@ -52,49 +62,6 @@ Hooks.on("getSceneControlButtons", (controls) => {
     if (!notes.tools[tool.name]) notes.tools[tool.name] = tool;
   }
 });
-
-/** Safely strip HTML to plain text across FVTT versions/browsers */
-function stripHTMLSafe(input) {
-  const html = String(input ?? "");
-  const div = document.createElement("div");
-  div.innerHTML = html;
-  const text = (div.textContent || div.innerText || "")
-    .replace(/\s+/g, " ")
-    .trim();
-  return text;
-}
-
-/** Defensive can-delete check across versions */
-function canDeleteMessage(msg, user) {
-  try {
-    if (user?.isGM) return true;
-    if (typeof msg?.canUserModify === "function")
-      return msg.canUserModify(user, "delete");
-    if ("isOwner" in msg) return !!msg.isOwner;
-  } catch (e) {
-    /* ignore */
-  }
-  return false;
-}
-
-/** Cross-version bulk delete */
-async function deleteMessagesByIds(ids) {
-  const coll = game.messages;
-  if (coll && typeof coll.deleteDocuments === "function") {
-    return coll.deleteDocuments(ids);
-  }
-  if (typeof ChatMessage?.deleteDocuments === "function") {
-    return ChatMessage.deleteDocuments(ids);
-  }
-  // Fallback: delete one-by-one
-  for (const id of ids) {
-    const m = game.messages.get(id);
-    if (m && typeof m.delete === "function") {
-      // eslint-disable-next-line no-await-in-loop
-      await m.delete();
-    }
-  }
-}
 
 Hooks.once("init", async () => {
   await loadTemplates([
@@ -139,36 +106,8 @@ class ChatPrunerApp extends Application {
   }
 
   getData() {
-    const rows = this._getLastMessages(200);
+    const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
     return { rows, count: rows.length };
-  }
-
-  _getLastMessages(limit) {
-    const all = game.messages?.contents ?? [];
-    // oldest → newest for anchor logic
-    const slice = all
-      .slice(-limit)
-      .sort((a, b) => (a?.timestamp ?? 0) - (b?.timestamp ?? 0));
-    return slice.map((m) => {
-      const ts = m?.timestamp ?? m?._source?.timestamp ?? 0;
-      const when = ts ? new Date(ts).toLocaleString() : "";
-      const speaker = m?.speaker?.alias || m?.speaker?.actor || "—";
-      const user = m?.user?.name ?? "Unknown";
-
-      const fullText = stripHTMLSafe(m?.flavor || m?.content || "");
-      const previewText = fullText; // CSS will clamp to 2 lines
-
-      return {
-        id: m?.id,
-        when,
-        ts,
-        user,
-        speaker,
-        content: previewText, // for on-screen preview
-        full: fullText, // for native browser tooltip
-        canDelete: canDeleteMessage(m, game.user),
-      };
-    });
   }
 
   activateListeners(html) {
@@ -234,7 +173,7 @@ class ChatPrunerApp extends Application {
     if (!anchorId)
       return ui.notifications?.warn?.("Choose an anchor message first.");
 
-    const rows = this._getLastMessages(200); // oldest → newest
+    const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
     const idx = rows.findIndex((r) => r.id === anchorId);
     if (idx === -1)
       return ui.notifications?.error?.("Anchor message not found.");
@@ -266,7 +205,7 @@ class ChatPrunerApp extends Application {
     if (!anchorId)
       return ui.notifications?.warn?.("Choose an anchor message first.");
 
-    const rows = this._getLastMessages(200); // oldest → newest
+    const rows = getLastMessages(CHAT_PRUNER_CONSTANTS.DEFAULT_MESSAGE_LIMIT);
     const idx = rows.findIndex((r) => r.id === anchorId);
     if (idx === -1)
       return ui.notifications?.error?.("Anchor message not found.");
@@ -304,16 +243,10 @@ class ChatPrunerApp extends Application {
         "You don't have permission to delete the selected messages."
       );
 
-    try {
-      await deleteMessagesByIds(deletable);
-      ui.notifications?.info?.(`Deleted ${deletable.length} message(s).`);
-      this.render(true);
-    } catch (err) {
-      console.error(`${MOD} | delete failed`, err);
-      ui.notifications?.error?.(
-        "Some messages could not be deleted. See console for details."
-      );
-    }
+    await performDeleteOperation(deletable, {
+      onSuccess: () => this.render(true),
+      onError: () => {}, // Error already handled by performDeleteOperation
+    });
   }
 
   _about() {

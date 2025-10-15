@@ -3,7 +3,7 @@
   "name": "fvtt-chat-pruner",
   "title": "Chat Pruner",
   "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (Application v1).",
-  "version": "13.1.5.0",
+  "version": "13.1.5.1.1",
   "compatibility": {
     "minimum": "13",
     "verified": "13",
@@ -14,7 +14,7 @@
       "name": "Paulcheeba/crusherDestroyer666"
     }
   ],
-  "esmodules": ["module.js", "module-v2.js"],
+  "esmodules": ["chat-pruner-shared.js", "module.js", "module-v2.js"],
   "styles": ["styles.css"],
   "templates": ["templates/chat-pruner.hbs", "templates/chat-pruner-v2.hbs"],
   "license": "MIT",
