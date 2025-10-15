@@ -2,6 +2,54 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.1.6.0] - 2025-10-15 - 🎯 **NEW BASELINE: Smart Version Detection**
+
+### 🌟 **MAJOR MILESTONE**: Universal Foundry Compatibility (v11-v13)
+
+This release establishes **v13.1.6.0** as the new stable baseline, featuring intelligent version detection that automatically selects the optimal application interface based on the user's Foundry VTT version.
+
+### 🚀 **Key Achievements**
+
+#### **Smart Version Detection System**
+- ✅ **Automatic Interface Selection**: Detects Foundry version and chooses ApplicationV2 (v12+) or ApplicationV1 (v11)
+- ✅ **Broad Compatibility**: Supports Foundry VTT v11-v13 with optimal experience on each version
+- ✅ **Zero Breaking Changes**: Seamless upgrade path for all existing users
+- ✅ **Future-Proof Architecture**: Ready for upcoming Foundry versions
+
+#### **File Organization & Clarity**
+- ✅ **Descriptive Filenames**: 
+  - `module.js` → `chat-pruner-v1.js`
+  - `module-v2.js` → `chat-pruner-v2.js`
+  - `chat-pruner.hbs` → `chat-pruner-v1.hbs`
+- ✅ **Clear Module Structure**: Enhanced maintainability and development workflow
+- ✅ **Updated Cross-References**: All documentation and manifest files updated
+
+#### **Enhanced Compatibility Matrix**
+- ✅ **Foundry v11**: Uses ApplicationV1 (maximum compatibility)
+- ✅ **Foundry v12+**: Uses ApplicationV2 (optimal modern experience)
+- ✅ **Shared Utilities**: Both applications use identical core functionality from `chat-pruner-shared.js`
+
+### 🔧 **Technical Implementation**
+
+```javascript
+// Smart version detection in toolbar opener
+const foundryVersion = parseInt(game.version?.split('.')?.[0] ?? '0');
+if (foundryVersion >= 12 && module?.api?.openV2) {
+  module.api.openV2(); // Modern ApplicationV2
+} else if (module?.api?.open) {
+  module.api.open(); // Compatible ApplicationV1
+}
+```
+
+### 📦 **Files Modified**
+- `module.json`: Updated version to 13.1.6.0, minimum compatibility to v11
+- `chat-pruner-v1.js`: Renamed from module.js, smart version detection
+- `chat-pruner-v2.js`: Renamed from module-v2.js, maintains V2 implementation
+- `templates/chat-pruner-v1.hbs`: Renamed for clarity
+- All documentation updated with new file references
+
+---
+
 ## [13.1.5.0] - 2025-01-27 - 🌟 **STABLE BASELINE ESTABLISHED**
 
 ### 🎉 **MAJOR MILESTONE**: Complete ApplicationV2 Migration & V13 Compatibility

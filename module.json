@@ -3,7 +3,7 @@
   "name": "fvtt-chat-pruner",
   "title": "Chat Pruner",
   "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (smart ApplicationV1/V2 detection).",
-  "version": "13.1.5.2.2",
+  "version": "13.1.6.0",
   "compatibility": {
     "minimum": "11",
     "verified": "13",
