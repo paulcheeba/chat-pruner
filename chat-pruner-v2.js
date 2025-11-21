@@ -1,8 +1,8 @@
 /**
  * Chat Pruner - V2 Application (chat-pruner-v2.js)
- * Version: 13.1.5.2.2
+ * Version: 13.2.0.0
  * Compatible: Foundry VTT v12+ (ApplicationV2 required)
- * Description: Modern ApplicationV2 implementation with smart detection - STABLE BASELINE
+ * Description: Modern ApplicationV2 with native form controls - STABLE BASELINE
  */
 
 // Import shared utilities
@@ -89,36 +89,10 @@ if (ApplicationV2Class) {
 
     /**
      * ApplicationV2 lifecycle method - called after DOM is rendered
-     * This is where we initialize form elements to ensure they're visible
+     * CSS now handles all form element styling - no JavaScript manipulation needed
      */
     _onRender(context, options) {
-      console.log(`${MOD} | _onRender called - initializing form elements`);
-
-      // Force radio buttons and checkboxes to be properly rendered
-      // This fixes the "invisible until interaction" issue
-      const radioButtons = this.element.querySelectorAll('input[type="radio"]');
-      const checkboxes = this.element.querySelectorAll(
-        'input[type="checkbox"]'
-      );
-
-      // Trigger a layout recalculation to ensure proper rendering
-      radioButtons.forEach((radio) => {
-        // Force repaint by accessing offsetHeight
-        radio.offsetHeight;
-        // Ensure proper styling is applied
-        radio.style.display = "inline-block";
-      });
-
-      checkboxes.forEach((checkbox) => {
-        // Force repaint by accessing offsetHeight
-        checkbox.offsetHeight;
-        // Ensure proper styling is applied
-        checkbox.style.display = "inline-block";
-      });
-
-      console.log(
-        `${MOD} | Form elements initialized - ${radioButtons.length} radios, ${checkboxes.length} checkboxes`
-      );
+      console.log(`${MOD} | _onRender called - DOM ready`);
     }
 
     // ========================================
@@ -273,11 +247,39 @@ if (ApplicationV2Class) {
     static _about(event, target) {
       event.preventDefault();
       foundry.applications.api.DialogV2.prompt({
-        window: { title: "About Chat Pruner" },
-        content: `<p><strong>Chat Pruner</strong> (GM-only). View last 200 chat messages; delete selected; or delete newer/older than an anchor.</p>
-                  <p>Compatible with Foundry VTT v13.</p>
-                  <p>For V1 interface: <code>game.modules.get('${MOD}')?.api?.open()</code></p>`,
-        ok: { label: "OK" },
+        window: {
+          title: "Chat Pruner V2 - Interactive UI Guide",
+          width: 600,
+          height: 500,
+        },
+        content: `
+          <div style="max-height: 400px; overflow-y: auto; padding-right: 8px;">
+            <h2 style="margin-top: 0; border-bottom: 2px solid #4c566a; padding-bottom: 8px;">Selection Controls</h2>
+            <p><strong>Select All Checkbox:</strong> Check this to instantly select or deselect all message checkboxes in the list at once.</p>
+            <p><strong>Individual Checkboxes:</strong> Check these boxes next to each message to mark them for deletion when using "Delete Selected."</p>
+
+            <h2 style="margin-top: 20px; border-bottom: 2px solid #4c566a; padding-bottom: 8px;">Anchor System</h2>
+            <p><strong>Radio Buttons:</strong> Click one radio button to set that message as your reference point for "Delete newer/older than anchor" operations.</p>
+
+            <h2 style="margin-top: 20px; border-bottom: 2px solid #4c566a; padding-bottom: 8px;">Action Buttons</h2>
+            <p><strong>Delete Selected:</strong> Removes all messages that have their checkboxes checked (requires confirmation dialog).</p>
+            <p><strong>Delete Newer Than Anchor:</strong> Deletes all messages that appear after your selected radio button anchor point.</p>
+            <p><strong>Delete Older Than Anchor:</strong> Deletes all messages that appear before your selected radio button anchor point.</p>
+
+            <h2 style="margin-top: 20px; border-bottom: 2px solid #4c566a; padding-bottom: 8px;">Utility Buttons</h2>
+            <p><strong>Refresh:</strong> Reloads the message list to show the most current chat state without closing the window.</p>
+            <p><strong>About:</strong> Opens this information dialog explaining Chat Pruner features and version details.</p>
+
+            <h2 style="margin-top: 20px; border-bottom: 2px solid #4c566a; padding-bottom: 8px;">Interactive Features</h2>
+            <p><strong>Row Clicking:</strong> Click anywhere on a message row (except controls) to toggle that row's selection checkbox.</p>
+            <p><strong>Content Tooltips:</strong> Hover over the Preview column to see the full message text in a tooltip popup.</p>
+
+            <p style="margin-top: 20px; padding-top: 12px; border-top: 1px solid #4c566a; font-size: 0.9em; color: #8f98a7;">
+              Each component provides immediate visual feedback and follows standard UI conventions for intuitive operation.
+            </p>
+          </div>
+        `,
+        ok: { label: "Close" },
       });
     }
 

@@ -1,7 +1,7 @@
 /**
  * Chat Pruner - Styles
- * Version: 13.1.5.0
- * Description: Styling for both V1 and V2 interfaces
+ * Version: 13.2.0.0
+ * Description: Styling for both V1 and V2 interfaces with native form controls
  */
 
 /* ================================
@@ -104,15 +104,29 @@
 }
 
 /* --- Cells --- */
-.cell.cb input[type="checkbox"],
-.cell.anchor input[type="radio"] {
-  cursor: pointer;
+/* Override Foundry V13's FontAwesome pseudo-element overlays on form inputs */
+.fvtt-chat-pruner .cell.cb input[type="checkbox"],
+.fvtt-chat-pruner .cell.anchor input[type="radio"] {
   appearance: auto !important;
-  -webkit-appearance: auto !important;
-  -moz-appearance: auto !important;
-  width: 16px;
-  height: 16px;
-  margin: 2px;
+  accent-color: #ee9b3a;
+}
+
+/* Remove Foundry's FontAwesome pseudo-element overlays for unchecked state */
+.fvtt-chat-pruner .cell.cb input[type="checkbox"]::before,
+.fvtt-chat-pruner .cell.cb input[type="checkbox"]::after,
+.fvtt-chat-pruner .cell.anchor input[type="radio"]::before,
+.fvtt-chat-pruner .cell.anchor input[type="radio"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* CRITICAL: Remove Foundry's FontAwesome pseudo-elements for checked state too */
+.fvtt-chat-pruner .cell.cb input[type="checkbox"]:checked::before,
+.fvtt-chat-pruner .cell.cb input[type="checkbox"]:checked::after,
+.fvtt-chat-pruner .cell.anchor input[type="radio"]:checked::before,
+.fvtt-chat-pruner .cell.anchor input[type="radio"]:checked::after {
+  content: none !important;
+  display: none !important;
 }
 
 .cell.time {

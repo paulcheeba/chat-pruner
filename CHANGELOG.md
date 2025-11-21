@@ -2,7 +2,109 @@
 
 All notable changes to this project will be documented in this file.
 
-## [13.1.6.0] - 2025-10-15 - 🎯 **NEW BASELINE: Smart Version Detection**
+## [13.2.0.0] - 2025-11-20 - 🎨 **NEW STABLE BASELINE: Native Form Controls & UI Polish**
+
+### 🌟 **MAJOR MILESTONE**: Root Cause Resolution & Clean UI Implementation
+
+This release establishes **v13.2.0.0** as the new stable baseline, resolving the fundamental form rendering issues by understanding and properly overriding Foundry V13's FontAwesome pseudo-element system.
+
+### 🚀 **Key Achievements**
+
+#### **Form Controls - Root Cause Fixed**
+
+- ✅ **FontAwesome Pseudo-Element Discovery**: Identified that Foundry V13 uses `::before` and `::after` pseudo-elements with FontAwesome icons on form inputs
+- ✅ **Minimal CSS Solution**: Reduced to only essential overrides (`appearance: auto` + pseudo-element removal)
+- ✅ **Both States Handled**: Properly removes pseudo-elements for both unchecked AND `:checked` states
+- ✅ **Zero JavaScript Manipulation**: Removed all inline style workarounds from `_onRender` method
+- ✅ **Clean Native Controls**: Pure browser radio buttons and checkboxes with no visual artifacts
+
+#### **Custom Styling**
+
+- ✅ **Orange Accent Color**: Custom `accent-color: #EE9B3A` for checkboxes and radio buttons
+- ✅ **Consistent Appearance**: Native browser controls maintain clean styling throughout all interactions
+- ✅ **No Overlay Issues**: Complete elimination of the FontAwesome icon overlay artifacts
+
+#### **UI Improvements**
+
+- ✅ **Removed Tip Section**: Cleaner footer with just action buttons
+- ✅ **Enhanced About Dialog**: 
+  - Larger dialog (600x500) for better readability
+  - Scrollable content area
+  - Comprehensive interactive UI guide
+  - Formatted sections with proper headings
+  - Detailed explanations of all controls and features
+
+### 🔧 **Technical Implementation**
+
+#### **CSS Solution** (styles.css)
+```css
+/* Force native browser controls */
+.fvtt-chat-pruner .cell.cb input[type="checkbox"],
+.fvtt-chat-pruner .cell.anchor input[type="radio"] {
+  appearance: auto !important;
+  accent-color: #EE9B3A;
+}
+
+/* Remove Foundry's FontAwesome pseudo-elements (unchecked) */
+input[type="checkbox"]::before,
+input[type="checkbox"]::after,
+input[type="radio"]::before,
+input[type="radio"]::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* CRITICAL: Remove pseudo-elements for :checked state too */
+input[type="checkbox"]:checked::before,
+input[type="checkbox"]:checked::after,
+input[type="radio"]:checked::before,
+input[type="radio"]:checked::after {
+  content: none !important;
+  display: none !important;
+}
+```
+
+#### **JavaScript Cleanup** (chat-pruner-v2.js)
+```javascript
+// Simplified _onRender - no form manipulation needed
+_onRender(context, options) {
+  console.log(`${MOD} | _onRender called - DOM ready`);
+  // CSS handles everything - no JavaScript manipulation required
+}
+```
+
+### 📚 **Research & Documentation**
+
+- ✅ **Foundry Wiki Research**: Discovered official documentation confirming V13's FontAwesome form styling
+- ✅ **Root Cause Analysis**: Broke the symptom-chasing loop by identifying the underlying pseudo-element system
+- ✅ **Knowledge Transfer**: Comprehensive session documentation for future reference
+
+### 🎯 **Breaking the Loop**
+
+This release resolves the recurring issue where:
+1. **Without CSS**: Foundry's pseudo-elements don't render initially (structural mismatch)
+2. **With incomplete CSS**: `:checked` state triggers new pseudo-elements creating overlays
+3. **With complete CSS**: Both states properly handled, no pseudo-elements, clean native controls
+
+### 📦 **Files Modified**
+
+- `styles.css`: Minimal essential CSS overrides for form controls
+- `chat-pruner-v2.js`: Cleaned `_onRender` method, enhanced About dialog
+- `templates/chat-pruner-v2.hbs`: Removed tip section from footer
+
+### 🧪 **Testing Confirmed**
+
+- ✅ Radio buttons render cleanly on initial load
+- ✅ Checkboxes render cleanly on initial load  
+- ✅ No visual artifacts when selecting controls
+- ✅ Custom orange accent color displays correctly
+- ✅ All form interactions work flawlessly
+- ✅ Zero deprecation warnings
+- ✅ Compatible with Foundry v12-v13
+
+---
+
+## [13.1.6.0] - 2025-10-15 - 🎯 **Smart Version Detection**
 
 ### 🌟 **MAJOR MILESTONE**: Universal Foundry Compatibility (v11-v13)
 

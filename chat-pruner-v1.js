@@ -1,6 +1,6 @@
 /**
  * Chat Pruner - V1 Application (chat-pruner-v1.js)
- * Version: 13.1.5.2.2
+ * Version: 13.2.0.0
  * Compatible: Foundry VTT v11-v13
  * Description: GM-only chat pruning tool with smart V1/V2 detection and toolbar integration
  */
