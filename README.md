@@ -31,7 +31,7 @@ Chat Pruner helps Game Masters maintain organized chat logs by providing flexibl
 - **Safe Operations**: All deletions require confirmation to prevent accidents
 - **Real-time Updates**: Refresh functionality to sync with current chat state
 
-## 📸 Screenshots
+## Screenshots
 
 ### Main Interface
 
@@ -79,7 +79,7 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 
 ### **Opening Chat Pruner**
 
-1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (📝 broom icon)
+1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (finger scissors icon)
    - Located in: **Toolbars** → **Journal/Notes** → **Chat Pruner**
 2. **Alternative**: Use the hotkey if configured in Foundry's controls settings
 
