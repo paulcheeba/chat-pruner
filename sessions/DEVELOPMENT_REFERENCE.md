@@ -1,15 +1,15 @@
 # Chat Pruner - Development Reference
 
-**Version: 13.1.5.0 - STABLE BASELINE**
+**Version: 13.2.0.0 - STABLE BASELINE**
 
 ## 🏗️ Project Overview
 
 **Module ID**: `fvtt-chat-pruner`
 **Repository**: `paulcheeba/chat-pruner`
-**Compatibility**: Foundry VTT v13 (ApplicationV2 required)
-**Current Stable**: v13.1.5.0 ⭐ **(STABLE BASELINE - ApplicationV2 Complete)**
-**Previous Baseline**: v13.1.4.7
-**Last Development**: v13.1.4.12 _(Promoted to v13.1.5.0)_
+**Compatibility**: Foundry VTT v11-v13 (Smart version detection)
+**Current Stable**: v13.2.0.0 ⭐ **(STABLE BASELINE - Native Form Controls)**
+**Previous Baseline**: v13.1.5.0
+**Last Development**: v13.1.6.0 _(Promoted to v13.2.0.0)_
 
 ## 📚 Essential References
 
@@ -62,7 +62,70 @@
 - **Stable releases**: `v1.x.x` series (current: v1.3.2)
 - **V13 development**: `v13.1.x.x` series for Foundry v13 features
 
-## � Recent Issues & Fixes
+## Recent Issues & Fixes
+
+### **v13.2.0.0: Root Cause Resolution - Foundry V13 FontAwesome Pseudo-Elements**
+
+**THE BREAKTHROUGH:**
+
+After extensive investigation and research into the Foundry VTT wiki, we discovered the root cause of the recurring form rendering issues that had been creating a symptom-chasing loop.
+
+**Root Cause Identified:**
+
+Foundry VTT V13 uses FontAwesome icons rendered via CSS `::before` and `::after` pseudo-elements on form inputs (checkboxes and radio buttons). The system:
+1. Hides the native browser form controls
+2. Creates pseudo-elements positioned over the inputs
+3. Styles those pseudo-elements with FontAwesome icons
+
+**Why It Failed in Chat Pruner:**
+
+- ApplicationV2 with `tag: "section"` doesn't provide the HTML structure Foundry's CSS expects
+- Without proper parent context, pseudo-elements don't render on initial load
+- Clicking triggers CSS recalculation, making pseudo-elements appear
+- The `:checked` state creates NEW pseudo-elements, causing visual artifacts/overlays
+
+**The Symptom Loop We Were Stuck In:**
+1. Without CSS overrides → Buttons invisible (pseudo-elements don't render)
+2. Add JavaScript inline styles → Buttons appear but get weird overlays when checked
+3. Try to fix overlays → Buttons disappear again
+4. Repeat...
+
+**The Solution:**
+
+Stop fighting Foundry's FontAwesome system and force native browser controls instead:
+
+```css
+/* Force native browser controls */
+.fvtt-chat-pruner .cell.cb input[type="checkbox"],
+.fvtt-chat-pruner .cell.anchor input[type="radio"] {
+  appearance: auto !important;
+  accent-color: #EE9B3A;  /* Custom orange color */
+}
+
+/* Remove Foundry's pseudo-elements for BOTH states */
+input[type="checkbox"]::before,
+input[type="checkbox"]::after,
+input[type="radio"]::before,
+input[type="radio"]::after,
+input[type="checkbox"]:checked::before,
+input[type="checkbox"]:checked::after,
+input[type="radio"]:checked::before,
+input[type="radio"]:checked::after {
+  content: none !important;
+  display: none !important;
+}
+```
+
+**Results:**
+- Clean native browser controls from initial render
+- No JavaScript manipulation needed in `_onRender`
+- Custom orange accent color (#EE9B3A)
+- Zero visual artifacts in any state
+- Works perfectly across all interactions
+
+**Key Documentation Source:**
+Foundry VTT Wiki ApplicationV2 Conversion Guide explicitly states:
+> "Checkboxes are now using FontAwesome icons instead of checkboxes, and styling them is now very tricky. You must style the 'before' and 'after' pseudo-elements of the checkbox, not the checkbox itself. You will also have to style the 'active' state of the checkbox for before and after pseudo-elements."
 
 ### **v13.1.4.10 → v13.1.4.11: Form Interaction Issues**
 
@@ -151,36 +214,45 @@
 
 ## 🏛️ Technical Architecture
 
-### 📁 File Structure
+### File Structure
 
 ```
 chat-pruner/
-├── module.js           # V1 Application (main functionality)
-├── module-v2.js        # V2 Application (future compatibility)
-├── module.json         # Manifest
-├── styles.css          # Styling
+├── chat-pruner-shared.js   # Shared utilities for V1 and V2
+├── chat-pruner-v1.js        # V1 Application (v11 compatibility)
+├── chat-pruner-v2.js        # V2 Application (v12+ ApplicationV2)
+├── module.json              # Manifest
+├── styles.css               # Styling with native form control overrides
 └── templates/
-    ├── chat-pruner.hbs     # V1 template
-    └── chat-pruner-v2.hbs  # V2 template
+    ├── chat-pruner-v1.hbs   # V1 template
+    └── chat-pruner-v2.hbs   # V2 template
 ```
 
-### 🎯 Module APIs
+### Module APIs
 
-#### V1 API (Stable)
+#### V1 API (Foundry v11)
 
 ```javascript
 // Access: game.modules.get('fvtt-chat-pruner')?.api?.open()
 // Class: ChatPrunerApp extends Application
 // Features: Full functionality, delete operations, anchors
+// Used automatically on Foundry v11
 ```
 
-#### V2 API (Development)
+#### V2 API (Foundry v12+)
 
 ```javascript
 // Access: game.modules.get('fvtt-chat-pruner')?.api?.openV2()
 // Class: ChatPrunerAppV2 extends ApplicationV2
-// Features: Read-only view, future expansion
+// Features: Full functionality with modern ApplicationV2 framework
+// Used automatically on Foundry v12+
 ```
+
+#### Smart Version Detection
+
+The toolbar button automatically detects Foundry version and opens the appropriate interface:
+- **v11**: Uses V1 Application (maximum compatibility)
+- **v12+**: Uses V2 ApplicationV2 (modern framework)
 
 ## 🧩 Foundry VTT API References
 
@@ -356,9 +428,39 @@ try {
 - Log diagnostic information for debugging
 - Maintain backward compatibility
 
-## 🔄 Recent Changes Log
+## Recent Changes Log
 
-### ⭐ v13.1.4.7 - NEW BASELINE: Complete ApplicationV2 Success
+### v13.2.0.0 - NEW STABLE BASELINE: Native Form Controls & Root Cause Resolution
+
+**MAJOR MILESTONE**: Broke the symptom-chasing loop by discovering and properly handling Foundry V13's FontAwesome pseudo-element system.
+
+**Key Achievements:**
+- Identified root cause: Foundry V13 uses `::before` and `::after` pseudo-elements with FontAwesome icons on form inputs
+- Implemented minimal CSS solution: `appearance: auto` + pseudo-element removal for both unchecked and `:checked` states
+- Removed all JavaScript workarounds from `_onRender` - CSS handles everything
+- Added custom orange accent color (#EE9B3A) for form controls
+- Enhanced About dialog with comprehensive UI guide (600x500, scrollable)
+- Removed footer tip section for cleaner interface
+- Zero visual artifacts in any interaction state
+
+**Technical Implementation:**
+- Pure CSS solution with no JavaScript manipulation
+- Properly targets both base state and `:checked` state pseudo-elements
+- Uses native browser controls instead of fighting Foundry's custom styling
+- Clean, maintainable code with minimal overrides
+
+**Status**: Production-ready stable baseline - form rendering issues completely resolved
+
+### v13.1.6.0 - Smart Version Detection & File Reorganization
+
+**Achievements:**
+- Implemented automatic version detection in toolbar button
+- Renamed files for clarity: `module.js` → `chat-pruner-v1.js`, etc.
+- Created shared utilities module (`chat-pruner-shared.js`)
+- Toolbar automatically selects V1 (v11) or V2 (v12+) based on Foundry version
+- Broad compatibility matrix (v11-v13)
+
+### v13.1.5.0 - ApplicationV2 Migration Complete
 
 - **MILESTONE**: Successfully implemented fully functional ApplicationV2 interface
 - Complete V2 template overhaul matching V1 functionality and design
@@ -433,6 +535,31 @@ game.modules.get('fvtt-chat-pruner')?.api?.openV2()   # V2
 
 ---
 
-_Last Updated: October 12, 2025_
-_Current Version: 13.1.4.3_
+## Critical Lessons Learned
+
+### The Foundry V13 Form Rendering Mystery
+
+**The Problem:**
+Form inputs (radio buttons, checkboxes) wouldn't render until clicked, then would show visual artifacts when selected.
+
+**What We Tried:**
+- CSS visibility overrides
+- JavaScript inline style manipulation
+- Various `appearance` property combinations
+- Different ApplicationV2 configurations (`tag: "form"` vs `tag: "section"`)
+
+**What We Learned:**
+Don't try to make Foundry's FontAwesome pseudo-element system work in incompatible contexts. Instead, explicitly opt out with:
+1. `appearance: auto !important` to force native controls
+2. Remove pseudo-elements for BOTH base and `:checked` states
+3. No JavaScript manipulation needed
+
+**Key Resources:**
+- Foundry VTT Wiki: ApplicationV2 Conversion Guide
+- Specifically the section on form element styling with FontAwesome
+
+---
+
+_Last Updated: November 21, 2025_
+_Current Version: 13.2.0.0_
 _Maintained by: GitHub Copilot + Paul Cheeba_
