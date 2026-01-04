@@ -2,6 +2,27 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.2.1.0] - 2026-01-04 - 🔗 **Module Dependency & CSS Compatibility**
+
+### ⚠️ **IMPORTANT: Foundry VTT v13+ Required**
+
+This version requires **Foundry VTT v13 or higher**.
+
+**If you are still using Foundry VTT v11 or v12**, please continue using **Chat Pruner v13.2.0.0**:
+
+- **Manifest URL**: `https://github.com/paulcheeba/chat-pruner/releases/download/v13.2.0.0/module.json`
+
+### 🔌 **New Dependency**
+
+- ✅ **OverEngineeredVTT Suite Monitor**: Added required dependency on `oev-suite-monitor` module
+  - Provides centralized monitoring and management capabilities
+  - Automatic installation via Foundry's module dependency system
+  - Repository: https://github.com/paulcheeba/OverEngineeredVTT-Suite-Monitor
+
+### 📦 **Files Modified**
+
+- `module.json`: Added `relationships.requires` with oev-suite-monitor dependency, updated compatibility to v13+
+
 ## [13.2.0.0] - 2025-11-20 - 🎨 **NEW STABLE BASELINE: Native Form Controls & UI Polish**
 
 ### 🌟 **MAJOR MILESTONE**: Root Cause Resolution & Clean UI Implementation
@@ -27,7 +48,7 @@ This release establishes **v13.2.0.0** as the new stable baseline, resolving the
 #### **UI Improvements**
 
 - ✅ **Removed Tip Section**: Cleaner footer with just action buttons
-- ✅ **Enhanced About Dialog**: 
+- ✅ **Enhanced About Dialog**:
   - Larger dialog (600x500) for better readability
   - Scrollable content area
   - Comprehensive interactive UI guide
@@ -37,12 +58,13 @@ This release establishes **v13.2.0.0** as the new stable baseline, resolving the
 ### 🔧 **Technical Implementation**
 
 #### **CSS Solution** (styles.css)
+
 ```css
 /* Force native browser controls */
 .fvtt-chat-pruner .cell.cb input[type="checkbox"],
 .fvtt-chat-pruner .cell.anchor input[type="radio"] {
   appearance: auto !important;
-  accent-color: #EE9B3A;
+  accent-color: #ee9b3a;
 }
 
 /* Remove Foundry's FontAwesome pseudo-elements (unchecked) */
@@ -65,6 +87,7 @@ input[type="radio"]:checked::after {
 ```
 
 #### **JavaScript Cleanup** (chat-pruner-v2.js)
+
 ```javascript
 // Simplified _onRender - no form manipulation needed
 _onRender(context, options) {
@@ -82,6 +105,7 @@ _onRender(context, options) {
 ### 🎯 **Breaking the Loop**
 
 This release resolves the recurring issue where:
+
 1. **Without CSS**: Foundry's pseudo-elements don't render initially (structural mismatch)
 2. **With incomplete CSS**: `:checked` state triggers new pseudo-elements creating overlays
 3. **With complete CSS**: Both states properly handled, no pseudo-elements, clean native controls
@@ -95,7 +119,7 @@ This release resolves the recurring issue where:
 ### 🧪 **Testing Confirmed**
 
 - ✅ Radio buttons render cleanly on initial load
-- ✅ Checkboxes render cleanly on initial load  
+- ✅ Checkboxes render cleanly on initial load
 - ✅ No visual artifacts when selecting controls
 - ✅ Custom orange accent color displays correctly
 - ✅ All form interactions work flawlessly

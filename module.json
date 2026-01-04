@@ -3,11 +3,11 @@
   "name": "fvtt-chat-pruner",
   "title": "Chat Pruner",
   "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (smart ApplicationV1/V2 detection).",
-  "version": "13.2.0.0",
+  "version": "13.2.1.0",
   "compatibility": {
-    "minimum": "11",
+    "minimum": "13",
     "verified": "13",
-    "maximum": "13"
+    "maximum": "13.999"
   },
   "authors": [
     {
@@ -24,5 +24,15 @@
   "license": "MIT",
   "url": "https://github.com/paulcheeba/chat-pruner",
   "manifest": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json",
-  "download": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip"
+  "download": "https://github.com/paulcheeba/chat-pruner/releases/latest/download/chat-pruner.zip",
+  "relationships": {
+    "requires": [
+      {
+        "id": "oev-suite-monitor",
+        "type": "module",
+        "manifest": "https://github.com/paulcheeba/OverEngineeredVTT-Suite-Monitor/releases/latest/download/module.json",
+        "compatibility": {}
+      }
+    ]
+  }
 }

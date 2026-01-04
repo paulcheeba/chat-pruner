@@ -156,6 +156,7 @@
   display: -webkit-box; /* line-clamp mechanism */
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2; /* show up to 2 lines */
+  line-clamp: 2; /* standard property for compatibility */
   line-height: 1.25;
   max-height: calc(1.25em * 2 + 2px);
   cursor: help; /* indicates hover help is available */

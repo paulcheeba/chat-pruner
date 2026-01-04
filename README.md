@@ -1,9 +1,9 @@
-# Chat Pruner
-
 [![Foundry VTT Version](https://img.shields.io/badge/Foundry%20VTT-v13+-blue)](https://foundryvtt.com/)
 [![Latest Release](https://img.shields.io/github/v/release/paulcheeba/chat-pruner)](https://github.com/paulcheeba/chat-pruner/releases/latest)
 [![Downloads (All Time)](https://img.shields.io/github/downloads/paulcheeba/chat-pruner/total)](https://github.com/paulcheeba/chat-pruner/releases)
 [![Downloads (Latest)](https://img.shields.io/github/downloads/paulcheeba/chat-pruner/latest/total)](https://github.com/paulcheeba/chat-pruner/releases/latest)
+
+# Chat Pruner
 
 **A powerful GM tool for managing and cleaning up your Foundry VTT chat log**
 
@@ -35,15 +35,15 @@ Chat Pruner helps Game Masters maintain organized chat logs by providing flexibl
 
 ### Main Interface
 
-<img width="715" height="477" alt="image" src="https://github.com/user-attachments/assets/eba7bda0-7565-4ad6-ba04-1866fff54472" />
+<img width="721" height="485" alt="image" src="https://github.com/user-attachments/assets/296e418c-0e6d-4ecc-8e7a-a99d7abaf818" />
 
 ### Message Selection
 
-<img width="721" height="483" alt="image" src="https://github.com/user-attachments/assets/01a0900b-233f-4ce9-8993-a4d7d33a3672" />
+<img width="734" height="491" alt="image" src="https://github.com/user-attachments/assets/59f671a0-b9cc-4f1e-85fe-ebdeb0c7d448" />
 
 ### Anchor Operations
 
-<img width="719" height="482" alt="image" src="https://github.com/user-attachments/assets/d22e3f0e-c6e5-44cf-b08c-04c134e1fbed" />
+<img width="727" height="489" alt="image" src="https://github.com/user-attachments/assets/3bb008bb-c072-471c-bab7-8a40e1b694a1" />
 
 ## Installation
 
@@ -79,7 +79,7 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 
 ### **Opening Chat Pruner**
 
-1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (finger scissors icon)
+1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (📝 broom icon)
    - Located in: **Toolbars** → **Journal/Notes** → **Chat Pruner**
 2. **Alternative**: Use the hotkey if configured in Foundry's controls settings
 
@@ -113,12 +113,6 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 - **Selective Cleanup**: Use individual selection for removing specific spam or errors
 - **Bulk Management**: Anchor operations are perfect for clearing large ranges of messages
 
-## Compatibility
-
-- **Foundry VTT**: Version 13.0.0 and newer
-- **Game Systems**: Compatible with all game systems
-- **Other Modules**: No known conflicts
-
 ## Permissions & Security
 
 - **GM Only**: Chat Pruner is exclusively available to Game Master users
@@ -126,16 +120,27 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 - **Confirmation Required**: All deletion operations require explicit confirmation
 - **No Auto-Delete**: No messages are deleted without direct user action
 
-## Support & Issues
+## Compatibility
+
+- **Foundry VTT**: Version 13.0.0 and newer
+- **Game Systems**: Compatible with all game systems
+- **Other Modules**: No known conflicts
+
+## Dependencies
+
+- This module is part of the **OverEngineeredVTT Suite** and Requires the installation of the lightweight OEV Suite Monitor, a master module that tracks OEV module versions for you and lets you know when updates or new modules are available.
+
+## Additional links
+
+- Join our [Discord](https://discord.gg/VNZwZTCB5U) server
+- Support me on [Patreon](https://www.patreon.com/cw/u45257624)
+
+## 🔧 Support & Issues
 
 - **Bug Reports**: [GitHub Issues](https://github.com/paulcheeba/chat-pruner/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/paulcheeba/chat-pruner/discussions)
 - **Latest Release**: [Download Here](https://github.com/paulcheeba/chat-pruner/releases/latest)
 
-## License
+## 📄 License
 
 This module is licensed under the [MIT License](LICENSE).
-
----
-
-**Chat Pruner v13.1.5.0** - Keep your Foundry VTT chat organized and focused!
