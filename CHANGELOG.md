@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ## [13.2.1.0] - 2026-01-04 - 🔗 **Module Dependency & CSS Compatibility**
 
+### ⚠️ **IMPORTANT: Foundry VTT v13+ Required**
+
+This version requires **Foundry VTT v13 or higher**.
+
+**If you are still using Foundry VTT v11 or v12**, please continue using **Chat Pruner v13.2.0.0**:
+
+- **Manifest URL**: `https://github.com/paulcheeba/chat-pruner/releases/download/v13.2.0.0/module.json`
+
 ### 🔌 **New Dependency**
 
 - ✅ **OverEngineeredVTT Suite Monitor**: Added required dependency on `oev-suite-monitor` module
@@ -13,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 ### 📦 **Files Modified**
 
-- `module.json`: Added `relationships.requires` with oev-suite-monitor dependency
+- `module.json`: Added `relationships.requires` with oev-suite-monitor dependency, updated compatibility to v13+
 
 ## [13.2.0.0] - 2025-11-20 - 🎨 **NEW STABLE BASELINE: Native Form Controls & UI Polish**
 

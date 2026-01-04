@@ -5,7 +5,7 @@
   "description": "GM-only chat manager: view last 200 messages, multi-select delete, or delete everything after an anchor message. v11–v13 compatible (smart ApplicationV1/V2 detection).",
   "version": "13.2.1.0",
   "compatibility": {
-    "minimum": "11",
+    "minimum": "13",
     "verified": "13",
     "maximum": "13.999"
   },
