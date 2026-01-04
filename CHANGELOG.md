@@ -27,7 +27,7 @@ This release establishes **v13.2.0.0** as the new stable baseline, resolving the
 #### **UI Improvements**
 
 - ✅ **Removed Tip Section**: Cleaner footer with just action buttons
-- ✅ **Enhanced About Dialog**: 
+- ✅ **Enhanced About Dialog**:
   - Larger dialog (600x500) for better readability
   - Scrollable content area
   - Comprehensive interactive UI guide
@@ -37,12 +37,13 @@ This release establishes **v13.2.0.0** as the new stable baseline, resolving the
 ### 🔧 **Technical Implementation**
 
 #### **CSS Solution** (styles.css)
+
 ```css
 /* Force native browser controls */
 .fvtt-chat-pruner .cell.cb input[type="checkbox"],
 .fvtt-chat-pruner .cell.anchor input[type="radio"] {
   appearance: auto !important;
-  accent-color: #EE9B3A;
+  accent-color: #ee9b3a;
 }
 
 /* Remove Foundry's FontAwesome pseudo-elements (unchecked) */
@@ -65,6 +66,7 @@ input[type="radio"]:checked::after {
 ```
 
 #### **JavaScript Cleanup** (chat-pruner-v2.js)
+
 ```javascript
 // Simplified _onRender - no form manipulation needed
 _onRender(context, options) {
@@ -82,6 +84,7 @@ _onRender(context, options) {
 ### 🎯 **Breaking the Loop**
 
 This release resolves the recurring issue where:
+
 1. **Without CSS**: Foundry's pseudo-elements don't render initially (structural mismatch)
 2. **With incomplete CSS**: `:checked` state triggers new pseudo-elements creating overlays
 3. **With complete CSS**: Both states properly handled, no pseudo-elements, clean native controls
@@ -95,7 +98,7 @@ This release resolves the recurring issue where:
 ### 🧪 **Testing Confirmed**
 
 - ✅ Radio buttons render cleanly on initial load
-- ✅ Checkboxes render cleanly on initial load  
+- ✅ Checkboxes render cleanly on initial load
 - ✅ No visual artifacts when selecting controls
 - ✅ Custom orange accent color displays correctly
 - ✅ All form interactions work flawlessly
