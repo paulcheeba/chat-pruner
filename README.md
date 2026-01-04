@@ -35,15 +35,15 @@ Chat Pruner helps Game Masters maintain organized chat logs by providing flexibl
 
 ### Main Interface
 
-<img width="721" height="485" alt="image" src="https://github.com/user-attachments/assets/296e418c-0e6d-4ecc-8e7a-a99d7abaf818" />
+<img width="720" height="479" alt="image" src="https://github.com/user-attachments/assets/41a34492-1763-47bf-ac6a-e3608d20554f" />
 
 ### Message Selection
 
-<img width="734" height="491" alt="image" src="https://github.com/user-attachments/assets/59f671a0-b9cc-4f1e-85fe-ebdeb0c7d448" />
+<img width="720" height="479" alt="image" src="https://github.com/user-attachments/assets/63a319cc-40a9-4cef-96d3-8bf3ef9878be" />
 
 ### Anchor Operations
 
-<img width="727" height="489" alt="image" src="https://github.com/user-attachments/assets/3bb008bb-c072-471c-bab7-8a40e1b694a1" />
+<img width="719" height="481" alt="image" src="https://github.com/user-attachments/assets/bf034373-b32e-48e2-8b9d-9ac986f59668" />
 
 ## Installation
 
@@ -79,7 +79,7 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 
 ### **Opening Chat Pruner**
 
-1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (📝 broom icon)
+1. **Toolbar Access**: Click the Chat Pruner icon in the toolbar (finger scissors icon)
    - Located in: **Toolbars** → **Journal/Notes** → **Chat Pruner**
 2. **Alternative**: Use the hotkey if configured in Foundry's controls settings
 
@@ -135,12 +135,12 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 - Join our [Discord](https://discord.gg/VNZwZTCB5U) server
 - Support me on [Patreon](https://www.patreon.com/cw/u45257624)
 
-## 🔧 Support & Issues
+## Support & Issues
 
 - **Bug Reports**: [GitHub Issues](https://github.com/paulcheeba/chat-pruner/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/paulcheeba/chat-pruner/discussions)
 - **Latest Release**: [Download Here](https://github.com/paulcheeba/chat-pruner/releases/latest)
 
-## 📄 License
+## License
 
 This module is licensed under the [MIT License](LICENSE).
