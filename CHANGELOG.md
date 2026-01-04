@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [13.2.1.0] - 2026-01-04 - 🔗 **Module Dependency & CSS Compatibility**
+
+### 🔌 **New Dependency**
+
+- ✅ **OverEngineeredVTT Suite Monitor**: Added required dependency on `oev-suite-monitor` module
+  - Provides centralized monitoring and management capabilities
+  - Automatic installation via Foundry's module dependency system
+  - Repository: https://github.com/paulcheeba/OverEngineeredVTT-Suite-Monitor
+
+### 📦 **Files Modified**
+
+- `module.json`: Added `relationships.requires` with oev-suite-monitor dependency
+
 ## [13.2.0.0] - 2025-11-20 - 🎨 **NEW STABLE BASELINE: Native Form Controls & UI Polish**
 
 ### 🌟 **MAJOR MILESTONE**: Root Cause Resolution & Clean UI Implementation

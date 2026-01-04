@@ -132,8 +132,8 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 
 ## Additional links
 
-Join our [Discord](https://discord.gg/VNZwZTCB5U) server
-Support me on [Patreon](https://www.patreon.com/cw/u45257624)
+- Join our [Discord](https://discord.gg/VNZwZTCB5U) server
+- Support me on [Patreon](https://www.patreon.com/cw/u45257624)
 
 ## 🔧 Support & Issues
 
