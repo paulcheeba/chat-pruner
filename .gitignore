@@ -1,3 +1,19 @@
-# Development and AI session files
-devFolder/
-prompts/
+# IDE files
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Development folders
+.github/instructions/
+.github/prompts/
+/.github/devFolder/fvtt-chat-prunerPostTemplates/
+/.github/devFolder/PostTemplates/
+/.github/devFolder/console-logs/
+/.github/devFolder/referenceDocs/
+/.github/devFolder/AI Chat Sessions/
+
+/.github/devFolder/posts/discordReleasePosts.md
+/.github/devFolder/posts/patreonPosts.md

@@ -122,7 +122,7 @@ https://github.com/paulcheeba/chat-pruner/releases/latest/download/module.json
 
 ## Compatibility
 
-- **Foundry VTT**: Version 13.0.0 and newer
+- **Foundry VTT**: v13 and v14
 - **Game Systems**: Compatible with all game systems
 - **Other Modules**: No known conflicts
 

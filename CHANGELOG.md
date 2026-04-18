@@ -2,9 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## [13.2.1.0] - 2026-01-04 - 🔗 **Module Dependency & CSS Compatibility**
+## [14.0.0.0] - 2026-04-18 - **Foundry VTT v14 Compatibility**
 
-### ⚠️ **IMPORTANT: Foundry VTT v13+ Required**
+### **Compatibility**
+
+- Updated for compatibility with **Foundry VTT v14**
+
+### **Changes**
+
+- Version bump to **v14.0.0.0** (manifest + documentation)
+
+## [13.2.1.0] - 2026-01-04 - **Module Dependency & CSS Compatibility**
+
+### **IMPORTANT: Foundry VTT v13+ Required**
 
 This version requires **Foundry VTT v13 or higher**.
 
@@ -12,50 +22,50 @@ This version requires **Foundry VTT v13 or higher**.
 
 - **Manifest URL**: `https://github.com/paulcheeba/chat-pruner/releases/download/v13.2.0.0/module.json`
 
-### 🔌 **New Dependency**
+### **New Dependency**
 
-- ✅ **OverEngineeredVTT Suite Monitor**: Added required dependency on `oev-suite-monitor` module
+- **OverEngineeredVTT Suite Monitor**: Added required dependency on `oev-suite-monitor` module
   - Provides centralized monitoring and management capabilities
   - Automatic installation via Foundry's module dependency system
   - Repository: https://github.com/paulcheeba/OverEngineeredVTT-Suite-Monitor
 
-### 📦 **Files Modified**
+### **Files Modified**
 
 - `module.json`: Added `relationships.requires` with oev-suite-monitor dependency, updated compatibility to v13+
 
-## [13.2.0.0] - 2025-11-20 - 🎨 **NEW STABLE BASELINE: Native Form Controls & UI Polish**
+## [13.2.0.0] - 2025-11-20 - **NEW STABLE BASELINE: Native Form Controls & UI Polish**
 
-### 🌟 **MAJOR MILESTONE**: Root Cause Resolution & Clean UI Implementation
+### **MAJOR MILESTONE**: Root Cause Resolution & Clean UI Implementation
 
 This release establishes **v13.2.0.0** as the new stable baseline, resolving the fundamental form rendering issues by understanding and properly overriding Foundry V13's FontAwesome pseudo-element system.
 
-### 🚀 **Key Achievements**
+### **Key Achievements**
 
 #### **Form Controls - Root Cause Fixed**
 
-- ✅ **FontAwesome Pseudo-Element Discovery**: Identified that Foundry V13 uses `::before` and `::after` pseudo-elements with FontAwesome icons on form inputs
-- ✅ **Minimal CSS Solution**: Reduced to only essential overrides (`appearance: auto` + pseudo-element removal)
-- ✅ **Both States Handled**: Properly removes pseudo-elements for both unchecked AND `:checked` states
-- ✅ **Zero JavaScript Manipulation**: Removed all inline style workarounds from `_onRender` method
-- ✅ **Clean Native Controls**: Pure browser radio buttons and checkboxes with no visual artifacts
+- **FontAwesome Pseudo-Element Discovery**: Identified that Foundry V13 uses `::before` and `::after` pseudo-elements with FontAwesome icons on form inputs
+- **Minimal CSS Solution**: Reduced to only essential overrides (`appearance: auto` + pseudo-element removal)
+- **Both States Handled**: Properly removes pseudo-elements for both unchecked AND `:checked` states
+- **Zero JavaScript Manipulation**: Removed all inline style workarounds from `_onRender` method
+- **Clean Native Controls**: Pure browser radio buttons and checkboxes with no visual artifacts
 
 #### **Custom Styling**
 
-- ✅ **Orange Accent Color**: Custom `accent-color: #EE9B3A` for checkboxes and radio buttons
-- ✅ **Consistent Appearance**: Native browser controls maintain clean styling throughout all interactions
-- ✅ **No Overlay Issues**: Complete elimination of the FontAwesome icon overlay artifacts
+- **Orange Accent Color**: Custom `accent-color: #EE9B3A` for checkboxes and radio buttons
+- **Consistent Appearance**: Native browser controls maintain clean styling throughout all interactions
+- **No Overlay Issues**: Complete elimination of the FontAwesome icon overlay artifacts
 
 #### **UI Improvements**
 
-- ✅ **Removed Tip Section**: Cleaner footer with just action buttons
-- ✅ **Enhanced About Dialog**:
+- **Removed Tip Section**: Cleaner footer with just action buttons
+- **Enhanced About Dialog**:
   - Larger dialog (600x500) for better readability
   - Scrollable content area
   - Comprehensive interactive UI guide
   - Formatted sections with proper headings
   - Detailed explanations of all controls and features
 
-### 🔧 **Technical Implementation**
+### **Technical Implementation**
 
 #### **CSS Solution** (styles.css)
 
@@ -96,13 +106,13 @@ _onRender(context, options) {
 }
 ```
 
-### 📚 **Research & Documentation**
+### **Research & Documentation**
 
-- ✅ **Foundry Wiki Research**: Discovered official documentation confirming V13's FontAwesome form styling
-- ✅ **Root Cause Analysis**: Broke the symptom-chasing loop by identifying the underlying pseudo-element system
-- ✅ **Knowledge Transfer**: Comprehensive session documentation for future reference
+- **Foundry Wiki Research**: Discovered official documentation confirming V13's FontAwesome form styling
+- **Root Cause Analysis**: Broke the symptom-chasing loop by identifying the underlying pseudo-element system
+- **Knowledge Transfer**: Comprehensive session documentation for future reference
 
-### 🎯 **Breaking the Loop**
+### **Breaking the Loop**
 
 This release resolves the recurring issue where:
 
@@ -110,55 +120,55 @@ This release resolves the recurring issue where:
 2. **With incomplete CSS**: `:checked` state triggers new pseudo-elements creating overlays
 3. **With complete CSS**: Both states properly handled, no pseudo-elements, clean native controls
 
-### 📦 **Files Modified**
+### **Files Modified**
 
 - `styles.css`: Minimal essential CSS overrides for form controls
 - `chat-pruner-v2.js`: Cleaned `_onRender` method, enhanced About dialog
 - `templates/chat-pruner-v2.hbs`: Removed tip section from footer
 
-### 🧪 **Testing Confirmed**
+### **Testing Confirmed**
 
-- ✅ Radio buttons render cleanly on initial load
-- ✅ Checkboxes render cleanly on initial load
-- ✅ No visual artifacts when selecting controls
-- ✅ Custom orange accent color displays correctly
-- ✅ All form interactions work flawlessly
-- ✅ Zero deprecation warnings
-- ✅ Compatible with Foundry v12-v13
+- Radio buttons render cleanly on initial load
+- Checkboxes render cleanly on initial load
+- No visual artifacts when selecting controls
+- Custom orange accent color displays correctly
+- All form interactions work flawlessly
+- Zero deprecation warnings
+- Compatible with Foundry v12-v13
 
 ---
 
-## [13.1.6.0] - 2025-10-15 - 🎯 **Smart Version Detection**
+## [13.1.6.0] - 2025-10-15 - **Smart Version Detection**
 
-### 🌟 **MAJOR MILESTONE**: Universal Foundry Compatibility (v11-v13)
+### **MAJOR MILESTONE**: Universal Foundry Compatibility (v11-v13)
 
 This release establishes **v13.1.6.0** as the new stable baseline, featuring intelligent version detection that automatically selects the optimal application interface based on the user's Foundry VTT version.
 
-### 🚀 **Key Achievements**
+### **Key Achievements**
 
 #### **Smart Version Detection System**
 
-- ✅ **Automatic Interface Selection**: Detects Foundry version and chooses ApplicationV2 (v12+) or ApplicationV1 (v11)
-- ✅ **Broad Compatibility**: Supports Foundry VTT v11-v13 with optimal experience on each version
-- ✅ **Zero Breaking Changes**: Seamless upgrade path for all existing users
-- ✅ **Future-Proof Architecture**: Ready for upcoming Foundry versions
+- **Automatic Interface Selection**: Detects Foundry version and chooses ApplicationV2 (v12+) or ApplicationV1 (v11)
+- **Broad Compatibility**: Supports Foundry VTT v11-v13 with optimal experience on each version
+- **Zero Breaking Changes**: Seamless upgrade path for all existing users
+- **Future-Proof Architecture**: Ready for upcoming Foundry versions
 
 #### **File Organization & Clarity**
 
-- ✅ **Descriptive Filenames**:
+- **Descriptive Filenames**:
   - `module.js` → `chat-pruner-v1.js`
   - `module-v2.js` → `chat-pruner-v2.js`
   - `chat-pruner.hbs` → `chat-pruner-v1.hbs`
-- ✅ **Clear Module Structure**: Enhanced maintainability and development workflow
-- ✅ **Updated Cross-References**: All documentation and manifest files updated
+- **Clear Module Structure**: Enhanced maintainability and development workflow
+- **Updated Cross-References**: All documentation and manifest files updated
 
 #### **Enhanced Compatibility Matrix**
 
-- ✅ **Foundry v11**: Uses ApplicationV1 (maximum compatibility)
-- ✅ **Foundry v12+**: Uses ApplicationV2 (optimal modern experience)
-- ✅ **Shared Utilities**: Both applications use identical core functionality from `chat-pruner-shared.js`
+- **Foundry v11**: Uses ApplicationV1 (maximum compatibility)
+- **Foundry v12+**: Uses ApplicationV2 (optimal modern experience)
+- **Shared Utilities**: Both applications use identical core functionality from `chat-pruner-shared.js`
 
-### 🔧 **Technical Implementation**
+### **Technical Implementation**
 
 ```javascript
 // Smart version detection in toolbar opener
@@ -170,7 +180,7 @@ if (foundryVersion >= 12 && module?.api?.openV2) {
 }
 ```
 
-### 📦 **Files Modified**
+### **Files Modified**
 
 - `module.json`: Updated version to 13.1.6.0, minimum compatibility to v11
 - `chat-pruner-v1.js`: Renamed from module.js, smart version detection
@@ -180,36 +190,36 @@ if (foundryVersion >= 12 && module?.api?.openV2) {
 
 ---
 
-## [13.1.5.0] - 2025-01-27 - 🌟 **STABLE BASELINE ESTABLISHED**
+## [13.1.5.0] - 2025-01-27 - **STABLE BASELINE ESTABLISHED**
 
-### 🎉 **MAJOR MILESTONE**: Complete ApplicationV2 Migration & V13 Compatibility
+### **MAJOR MILESTONE**: Complete ApplicationV2 Migration & V13 Compatibility
 
 This release establishes **v13.1.5.0** as the new stable baseline, representing the successful completion of the ApplicationV2 migration with full V13 compatibility and production-ready quality.
 
-### 🚀 **Key Achievements**
+### **Key Achievements**
 
 #### **ApplicationV2 Framework Complete**
 
-- ✅ **Full V1 Feature Parity**: Complete migration from V1 Application to ApplicationV2
-- ✅ **Lifecycle Methods**: Proper implementation of `_onRender`, `_prepareContext`, and all ApplicationV2 patterns
-- ✅ **HandlebarsApplicationMixin**: Correct integration for template rendering
-- ✅ **Action System**: Complete replacement of `activateListeners()` with ApplicationV2 actions
+- **Full V1 Feature Parity**: Complete migration from V1 Application to ApplicationV2
+- **Lifecycle Methods**: Proper implementation of `_onRender`, `_prepareContext`, and all ApplicationV2 patterns
+- **HandlebarsApplicationMixin**: Correct integration for template rendering
+- **Action System**: Complete replacement of `activateListeners()` with ApplicationV2 actions
 
 #### **Form Interaction Resolution**
 
-- ✅ **Radio Button Fix**: Resolved invisibility issues through proper lifecycle management and CSS overrides
-- ✅ **Checkbox Functionality**: All form elements now work perfectly with user interactions
-- ✅ **CSS Compatibility**: Added `appearance: auto` overrides for V13 form element styling
-- ✅ **Event Handling**: Proper form initialization in `_onRender` lifecycle method
+- **Radio Button Fix**: Resolved invisibility issues through proper lifecycle management and CSS overrides
+- **Checkbox Functionality**: All form elements now work perfectly with user interactions
+- **CSS Compatibility**: Added `appearance: auto` overrides for V13 form element styling
+- **Event Handling**: Proper form initialization in `_onRender` lifecycle method
 
 #### **V13 Compatibility Complete**
 
-- ✅ **DialogV2 Migration**: Complete replacement of deprecated `Dialog.confirm()` with `DialogV2.confirm()`
-- ✅ **API Updates**: Updated all dialog usage to V13-compatible patterns
-- ✅ **Deprecation Warnings**: Eliminated all V1 Application deprecation warnings
-- ✅ **Modern Foundry APIs**: Full adoption of current Foundry VTT API standards
+- **DialogV2 Migration**: Complete replacement of deprecated `Dialog.confirm()` with `DialogV2.confirm()`
+- **API Updates**: Updated all dialog usage to V13-compatible patterns
+- **Deprecation Warnings**: Eliminated all V1 Application deprecation warnings
+- **Modern Foundry APIs**: Full adoption of current Foundry VTT API standards
 
-### 🔧 **Technical Improvements**
+### **Technical Improvements**
 
 #### **Code Quality & Architecture**
 
@@ -225,15 +235,15 @@ This release establishes **v13.1.5.0** as the new stable baseline, representing 
 - **Intuitive Controls**: Radio buttons and checkboxes behave as expected
 - **Reliable Operations**: All delete operations work consistently
 
-### 🧪 **Development Journey Highlights**
+### **Development Journey Highlights**
 
 - **v13.1.4.7**: Initial ApplicationV2 template rendering
 - **v13.1.4.8**: Full V1 functionality implementation
 - **v13.1.4.9-11**: Form interaction debugging and fixes
 - **v13.1.4.12**: V13 compatibility and DialogV2 migration
-- **v13.1.5.0**: **Stable baseline establishment** ⭐
+- **v13.1.5.0**: **Stable baseline establishment**
 
-### 📋 **Production Ready Status**
+### **Production Ready Status**
 
 - **User Testing**: Confirmed "working as expected" through comprehensive testing
 - **Quality Assurance**: All major functionality verified and stable
@@ -244,7 +254,7 @@ This release establishes **v13.1.5.0** as the new stable baseline, representing 
 
 ## [13.1.4.8] - 2025-10-13
 
-### 🎉 **MAJOR**: V2 Full Functionality Implementation
+### **MAJOR**: V2 Full Functionality Implementation
 
 - **Complete V1 Feature Parity**: V2 now has all V1 functionality using ApplicationV2 patterns
 - **ApplicationV2 Actions System**: Implemented proper action handlers for all buttons

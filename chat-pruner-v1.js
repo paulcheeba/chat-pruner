@@ -77,7 +77,7 @@ Hooks.on("getSceneControlButtons", (controls) => {
 });
 
 Hooks.once("init", async () => {
-  await loadTemplates([
+  await foundry.applications.handlebars.loadTemplates([
     `modules/${MOD}/templates/chat-pruner-v1.hbs`,
     `modules/${MOD}/templates/chat-pruner-v2.hbs`, // V2 additive template
   ]);
@@ -89,7 +89,7 @@ Hooks.once("ready", () => {
     mod.api = { open: () => ChatPrunerApp.open() };
   }
   console.log(
-    `${MOD} | Ready. Create a Macro with: game.modules.get('${MOD}')?.api?.open()`
+    `${MOD} | Ready. Create a Macro with: game.modules.get('${MOD}')?.api?.open()`,
   );
 });
 
@@ -100,7 +100,7 @@ class ChatPrunerApp extends Application {
       return;
     }
     const existing = Object.values(ui.windows).find(
-      (w) => w instanceof ChatPrunerApp
+      (w) => w instanceof ChatPrunerApp,
     );
     if (existing) return existing.bringToTop();
     new ChatPrunerApp().render(true);
@@ -197,7 +197,7 @@ class ChatPrunerApp extends Application {
 
     if (!ids.length)
       return ui.notifications?.info?.(
-        "No deletable messages newer than the selected anchor."
+        "No deletable messages newer than the selected anchor.",
       );
 
     const ok = await Dialog.confirm({
@@ -229,7 +229,7 @@ class ChatPrunerApp extends Application {
 
     if (!ids.length)
       return ui.notifications?.info?.(
-        "No deletable messages older than the selected anchor."
+        "No deletable messages older than the selected anchor.",
       );
 
     const ok = await Dialog.confirm({
@@ -253,7 +253,7 @@ class ChatPrunerApp extends Application {
 
     if (!deletable.length)
       return ui.notifications?.error?.(
-        "You don't have permission to delete the selected messages."
+        "You don't have permission to delete the selected messages.",
       );
 
     await performDeleteOperation(deletable, {
