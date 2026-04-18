@@ -1,7 +1,0 @@
-.DS_Store
-.vscode/*
-!.vscode/settings.json
-!.vscode/keybindings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/copilot-job-card.md
